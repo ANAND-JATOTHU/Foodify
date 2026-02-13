@@ -7,6 +7,11 @@ def index(request):
     return render(request, 'index.html')
 
 
+def test_credentials(request):
+    """Test credentials page - shows login details for all test accounts"""
+    return render(request, 'test_credentials.html')
+
+
 def contact(request):
     """Contact page"""
     if request.method == 'POST':

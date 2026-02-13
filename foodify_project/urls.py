@@ -26,6 +26,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
     path('contact/', views.contact, name='contact'),
+    path('test-credentials/', views.test_credentials, name='test_credentials'),  # Test credentials page
     path('accounts/', include('accounts.urls')),
     path('restaurants/', include('restaurants.urls')),
     path('orders/', include('orders.urls')),
