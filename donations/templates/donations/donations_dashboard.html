@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Your Donations - Foodify{% endblock %}
+
+{% block content %}
+<!-- Link Custom CSS -->
+<link rel="stylesheet" href="{% static 'css/donations_dashboard.css' %}">
+
+<div class="dashboard-container">
+    <div class="dashboard-card shadow-lg">
+        <!-- Gradient Header Section -->
+        <div class="gradient-header">
+            <h2>Manage Your Donations</h2>
+            <p>Your contribution makes a difference in someone's life today.</p>
+        </div>
+
+        <!-- Modern Toggle Tabs -->
+        <div class="tab-navigation">
+            <button class="tab-btn active" id="btn-donate" onclick="switchTab('donate')">
+                <span>🍎</span> Donate Food
+            </button>
+            <button class="tab-btn" id="btn-history" onclick="switchTab('history')">
+                <span>📋</span> My Donations
+            </button>
+        </div>
+
+        <div class="dashboard-body">
+            <!-- Donation Form Section -->
+            <div id="section-donate" class="form-section">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Food Item Name</label>
+                            {{ form.food_name }}
+                        </div>
+                        <div class="form-group">
+                            <label>Quantity (e.g., 5kg, 10 plates)</label>
+                            {{ form.quantity }}
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            {{ form.category }}
+                        </div>
+                        <div class="form-group">
+                            <label>Estimated Expiry Time</label>
+                            {{ form.expiry_time }}
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Pickup Address</label>
+                            {{ form.address }}
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Contact Number</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Additional Description (Optional)</label>
+                            {{ form.description }}
+                        </div>
+                    </div>
+                    <div class="submit-container">
+                        <button type="submit" class="btn-submit">Submit Donation</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- My Donations Table Section -->
+            <div id="section-history" class="table-section" style="display: none;">
+                <div class="table-responsive">
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>Food Item</th>
+                                <th>Quantity</th>
+                                <th>Status</th>
+                                <th>Date Submitted</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for donation in donations %}
+                            <tr>
+                                <td>
+                                    <div class="fw-bold">{{ donation.food_name }}</div>
+                                    <small class="text-muted">{{ donation.get_category_display }}</small>
+                                </td>
+                                <td>{{ donation.quantity }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if donation.status == 'available' %}badge-available
+                                        {% elif donation.status == 'reserved' %}badge-reserved
+                                        {% elif donation.status == 'collected' %}badge-collected
+                                        {% elif donation.status == 'expired' %}badge-expired
+                                        {% elif donation.status == 'cancelled' %}badge-cancelled
+                                        {% endif %}">
+                                        {{ donation.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ donation.created_at|date:"M d, Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div style="font-size: 3rem; margin-bottom: 10px;">📦</div>
+                                    <p class="text-muted">You haven't made any donations yet.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchTab(tab) {
+        const donateBtn = document.getElementById('btn-donate');
+        const historyBtn = document.getElementById('btn-history');
+        const donateSection = document.getElementById('section-donate');
+        const historySection = document.getElementById('section-history');
+
+        if (tab === 'donate') {
+            donateBtn.classList.add('active');
+            historyBtn.classList.remove('active');
+            donateSection.style.display = 'block';
+            historySection.style.display = 'none';
+        } else {
+            historyBtn.classList.add('active');
+            donateBtn.classList.remove('active');
+            historySection.style.display = 'block';
+            donateSection.style.display = 'none';
+        }
+    }
+
+    // Preserve tab state after form submission (if redirected to same page)
+    // For now simple JS toggle is enough as the view redirects to the dashboard
+</script>
+{% endblock %}

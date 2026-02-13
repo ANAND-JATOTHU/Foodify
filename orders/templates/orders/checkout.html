@@ -1,0 +1,413 @@
+{% extends 'base.html' %}
+
+{% block title %}Secure Checkout - Foodify{% endblock %}
+
+{% block content %}
+<style>
+    .checkout-container {
+        max-width: 1200px;
+        margin: 100px auto 60px;
+        padding: 0 20px;
+    }
+    .checkout-grid {
+        display: grid;
+        grid-template-columns: 1fr 450px;
+        gap: 30px;
+        align-items: start;
+    }
+    .payment-form {
+        background: white;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .payment-form h3 {
+        color: #7c3aed;
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+    .form-section {
+        margin-bottom: 25px;
+    }
+    .form-section h4 {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        color: #333;
+    }
+    .info-display {
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 8px;
+        color: #333;
+        line-height: 1.6;
+    }
+    #payment-element {
+        margin: 20px 0;
+    }
+    .payment-message {
+        color: #d32f2f;
+        font-size: 14px;
+        margin-top: 10px;
+        display: none;
+    }
+    .payment-message.visible {
+        display: block;
+    }
+    .submit-btn {
+        width: 100%;
+        padding: 16px;
+        background: #7c3aed;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+    }
+    .submit-btn:hover:not(:disabled) {
+        background: #6d28d9;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(124, 58, 237, 0.3);
+    }
+    .submit-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    .processing {
+        opacity: 0.7;
+    }
+    .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spinner 0.6s linear infinite;
+        margin-right: 8px;
+    }
+    @keyframes spinner {
+        to { transform: rotate(360deg); }
+    }
+    .order-summary {
+        background: white;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 100px;
+    }
+    .order-summary h2 {
+        margin-top: 0;
+        color: #7c3aed;
+    }
+    .summary-items {
+        max-height: 300px;
+        overflow-y: auto;
+        margin: 20px 0;
+    }
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .item-name {
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+    .item-quantity {
+        color: #666;
+        font-size: 0.85rem;
+    }
+    .item-price {
+        font-weight: 600;
+        color: #7c3aed;
+    }
+    .price-breakdown {
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 12px;
+        margin: 20px 0;
+    }
+    .price-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    .price-row.total {
+        border-top: 2px solid #7c3aed;
+        padding-top: 15px;
+        margin-top: 10px;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #7c3aed;
+    }
+    .security-note {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 15px;
+        background: #e8f5e9;
+        border-radius: 8px;
+        margin-top: 15px;
+        font-size: 0.9rem;
+        color: #2e7d32;
+    }
+    .back-link {
+        display: inline-block;
+        margin-bottom: 20px;
+        color: #7c3aed;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    .back-link:hover {
+        text-decoration: underline;
+    }
+    @media (max-width: 968px) {
+        .checkout-grid {
+            grid-template-columns: 1fr;
+        }
+        .order-summary {
+            position: static;
+            order: 1;
+        }
+        .payment-form {
+            order: 2;
+        }
+    }
+</style>
+
+<div class="checkout-container">
+    <a href="{% url 'orders:view_cart' %}" class="back-link">← Back to Cart</a>
+    
+    <h1>Secure Checkout</h1>
+    
+    <div class="checkout-grid">
+        <!-- Payment Form -->
+        <div class="payment-form">
+            <h3>💳 Payment Information</h3>
+            
+            <form id="payment-form">
+                {% csrf_token %}
+                
+                <!-- Delivery Information -->
+                <div class="form-section">
+                    <h4>🚚 Delivery Address</h4>
+                    <div class="info-display">{{ delivery_address }}</div>
+                </div>
+                
+                <div class="form-section">
+                    <h4>📞 Phone Number</h4>
+                    <div class="info-display">{{ phone }}</div>
+                </div>
+                
+                <!-- Stripe Payment Element -->
+                <div class="form-section">
+                    <h4>💰 Select Payment Method</h4>
+                    <div id="payment-element"></div>
+                </div>
+                
+                <div id="payment-message" class="payment-message"></div>
+                
+                <button type="submit" id="submit-button" class="submit-btn">
+                    <span id="button-text">Pay ₹{{ grand_total }}</span>
+                </button>
+                
+                <div class="security-note">
+                    <span>🔒</span>
+                    <span>Secured by Stripe • Your payment details are encrypted and safe</span>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Order Summary -->
+        <div class="order-summary">
+            <h2>Order Summary</h2>
+            
+            <div class="summary-items">
+                {% for item in cart_items %}
+                <div class="summary-item">
+                    <div class="item-details">
+                        <div class="item-name">{{ item.menu_item.name }}</div>
+                        <div class="item-quantity">Quantity: {{ item.quantity }}</div>
+                    </div>
+                    <div class="item-price">₹{{ item.subtotal }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="price-breakdown">
+                <div class="price-row">
+                    <span>Subtotal:</span>
+                    <span>₹{{ subtotal }}</span>
+                </div>
+                <div class="price-row">
+                    <span>Delivery Fee:</span>
+                    <span>₹{{ delivery_fee }}</span>
+                </div>
+                <div class="price-row">
+                    <span>Tax (5%):</span>
+                    <span>₹{{ tax }}</span>
+                </div>
+                <div class="price-row total">
+                    <span>Total:</span>
+                    <span>₹{{ grand_total }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+// Initialize Stripe
+const stripe = Stripe('{{ stripe_public_key }}');
+let elements;
+let paymentElement;
+
+// Initialize Payment Element
+async function initialize() {
+    try {
+        console.log('Initializing Stripe Payment Element...');
+        
+        // Create Payment Intent
+        const response = await fetch('{% url "orders:create_payment_intent" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        });
+        
+        console.log('Payment Intent API response status:', response.status);
+        
+        const data = await response.json();
+        console.log('Payment Intent API response data:', data);
+        
+        if (data.error) {
+            console.error('Payment Intent creation error:', data.error);
+            showMessage('Payment setup failed: ' + data.error);
+            return;
+        }
+        
+        if (!data.clientSecret) {
+            console.error('No clientSecret in response');
+            showMessage('Payment setup failed: No client secret received');
+            return;
+        }
+        
+        const clientSecret = data.clientSecret;
+        console.log('Client secret received, creating Payment Element...');
+        
+        // Create Elements instance
+        const appearance = {
+            theme: 'stripe',
+            variables: {
+                colorPrimary: '#7c3aed',
+                colorBackground: '#ffffff',
+                colorText: '#1a1a1a',
+                colorDanger: '#d32f2f',
+                borderRadius: '8px',
+            }
+        };
+        
+        elements = stripe.elements({ clientSecret, appearance });
+        
+        // Create and mount Payment Element
+        paymentElement = elements.create('payment');
+        paymentElement.mount('#payment-element');
+        
+        console.log('Payment Element mounted successfully');
+        
+    } catch (error) {
+        console.error('Error initializing payment:', error);
+        showMessage('Error initializing payment: ' + error.message);
+    }
+}
+
+// Handle form submission
+document.getElementById('payment-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+        // Confirm payment with Stripe
+        const { error, paymentIntent } = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+                return_url: window.location.origin + '/orders/payment/success/',
+            },
+            redirect: 'if_required'
+        });
+        
+        if (error) {
+            showMessage(error.message);
+            setLoading(false);
+            return;
+        }
+        
+        if (paymentIntent && paymentIntent.status === 'succeeded') {
+            // Payment successful, confirm with backend
+            const response = await fetch('{% url "orders:confirm_payment" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    payment_intent_id: paymentIntent.id
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Redirect to order detail page
+                window.location.href = result.redirect_url;
+            } else {
+                showMessage(result.error || 'Payment confirmation failed');
+                setLoading(false);
+            }
+        }
+        
+    } catch (error) {
+        showMessage('Payment error: ' + error.message);
+        setLoading(false);
+    }
+});
+
+function showMessage(messageText) {
+    const messageContainer = document.getElementById('payment-message');
+    messageContainer.textContent = messageText;
+    messageContainer.classList.add('visible');
+    
+    setTimeout(() => {
+        messageContainer.classList.remove('visible');
+    }, 5000);
+}
+
+function setLoading(isLoading) {
+    const submitButton = document.getElementById('submit-button');
+    const buttonText = document.getElementById('button-text');
+    
+    if (isLoading) {
+        submitButton.disabled = true;
+        submitButton.classList.add('processing');
+        buttonText.innerHTML = '<span class="spinner"></span>Processing...';
+    } else {
+        submitButton.disabled = false;
+        submitButton.classList.remove('processing');
+        buttonText.innerHTML = 'Pay ₹{{ grand_total }}';
+    }
+}
+
+// Initialize on page load
+initialize();
+</script>
+{% endblock %}

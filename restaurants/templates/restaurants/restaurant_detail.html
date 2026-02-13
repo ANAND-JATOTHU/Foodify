@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ restaurant.name }} - Foodify{% endblock %}
+
+{% block content %}
+<style>
+    .restaurant-header {
+        background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                    url("{% if restaurant.image %}{{ restaurant.image.url }}{% else %}{% static 'assets/pizza.png' %}{% endif %}") no-repeat center center/cover;
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-align: center;
+    }
+    .restaurant-header h1 {
+        font-size: 3rem;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+    .restaurant-info {
+        max-width: 1200px;
+        margin: -50px auto 30px;
+        padding: 0 20px;
+    }
+    .info-card {
+        background: white;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: var(--shadow-lg);
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+    .info-item {
+        text-align: center;
+    }
+    .info-icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+    .menu-container {
+        max-width: 1200px;
+        margin: 40px auto 60px;
+        padding: 0 20px;
+    }
+    .menu-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 25px;
+        margin-top: 30px;
+    }
+    .menu-item-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+        transition: transform 0.3s;
+    }
+    .menu-item-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+    .menu-item-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+    .menu-item-content {
+        padding: 20px;
+    }
+    .menu-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 10px;
+    }
+    .menu-item-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin: 0;
+    }
+    .menu-item-price {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+    .veg-badge {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid green;
+        border-radius: 4px;
+        position: relative;
+    }
+    .veg-badge::before {
+        content: '';
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: green;
+        border-radius: 50%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    .add-to-cart-btn {
+        width: 100%;
+        padding: 12px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 15px;
+    }
+    .add-to-cart-btn:hover {
+        background: var(--primary-dark);
+    }
+</style>
+
+<div class="restaurant-header">
+    <div>
+        <h1>{{ restaurant.name }}</h1>
+        <p style="font-size: 1.2rem;">{{ restaurant.cuisine }} Cuisine</p>
+    </div>
+</div>
+
+<div class="restaurant-info">
+    <div class="info-card">
+        <div class="info-item">
+            <div class="info-icon">⭐</div>
+            <div style="font-size: 1.5rem; font-weight: 700;">{{ restaurant.rating }}</div>
+            <div style="color: var(--text-muted);">Rating</div>
+        </div>
+        <div class="info-item">
+            <div class="info-icon">📍</div>
+            <div style="font-weight: 600;">{{ restaurant.location }}</div>
+            <div style="color: var(--text-muted);">{{ restaurant.distance }} km away</div>
+        </div>
+        {% if restaurant.is_veg %}
+        <div class="info-item">
+            <div class="info-icon">🥬</div>
+            <div style="font-weight: 600; color: green;">Pure Vegetarian</div>
+            <div style="color: var(--text-muted);">100% Veg</div>
+        </div>
+        {% endif %}
+        <div class="info-item">
+            <div class="info-icon">🍽️</div>
+            <div style="font-weight: 600;">{{ menu_items.count }} items</div>
+            <div style="color: var(--text-muted);">Menu Items</div>
+        </div>
+    </div>
+</div>
+
+<div class="menu-container">
+    <h2>Our Menu</h2>
+    {% if restaurant.description %}
+        <p style="color: var(--text-muted); margin-bottom: 30px;">{{ restaurant.description }}</p>
+    {% endif %}
+    
+    {% if menu_items %}
+        <div class="menu-grid">
+            {% for item in menu_items %}
+            <div class="menu-item-card">
+                {% if item.image %}
+                    <img src="{{ item.image.url }}" alt="{{ item.name }}" class="menu-item-image">
+                {% else %}
+                    <div class="menu-item-image" style="background: linear-gradient(135deg, var(--primary-light), var(--primary)); display: flex; align-items: center; justify-content: center; font-size: 4rem;">
+                        🍽️
+                    </div>
+                {% endif %}
+                
+                <div class="menu-item-content">
+                    <div class="menu-item-header">
+                        <div>
+                            <h3 class="menu-item-name">{{ item.name }}</h3>
+                            {% if item.is_veg %}
+                                <span class="veg-badge" title="Vegetarian"></span>
+                            {% endif %}
+                        </div>
+                        <div class="menu-item-price">₹{{ item.price }}</div>
+                    </div>
+                    
+                    {% if item.description %}
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 10px 0;">{{ item.description }}</p>
+                    {% endif %}
+                    
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'orders:add_to_cart' item.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="add-to-cart-btn">Add to Cart</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="add-to-cart-btn" style="text-align: center; display: block; text-decoration: none;">
+                            Login to Order
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 60px 20px; background: white; border-radius: 16px;">
+            <p style="color: var(--text-muted);">No menu items available at the moment.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

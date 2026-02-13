@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Food Delivery — Cart & Checkout</title>
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/navbar.css" />
+  <style>
+    /* Specific overrides */
+    .wrap { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+    
+    .grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 32px; }
+    @media(max-width:960px){ .grid { grid-template-columns: 1fr; } }
+
+    .menu { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
+    
+    .dish {
+      display: flex; gap: 16px; align-items: center; border-radius: 12px; padding: 12px;
+      background: white; border: 1px solid rgba(0,0,0,0.05); transition: all 0.2s;
+    }
+    .dish:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+    .dish .img { width: 80px; height: 80px; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+    .dish .img img { width: 100%; height: 100%; object-fit: cover; }
+    
+    /* Cart List */
+    .cart-list { display: flex; flex-direction: column; gap: 16px; }
+    .cart-item { display: flex; gap: 16px; align-items: center; padding: 10px; border-bottom: 1px solid #f3f4f6; animation: fadeIn 0.3s ease; }
+    .cart-item:last-child { border-bottom: none; }
+    .cart-item .img { width: 60px; height: 60px; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+    
+    .summary { display: flex; flex-direction: column; gap: 16px; }
+    .row { display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; }
+    .total { font-size: 1.25rem; font-weight: 800; color: var(--primary); padding-top: 16px; border-top: 2px dashed #eee; }
+    
+    input, select, textarea {
+      padding: 12px; border-radius: 8px; border: 1px solid #e0e0e0; width: 100%; font-family: inherit;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.1);
+    }
+    
+    .checkout-btn { width: 100%; margin-top: 16px; }
+    
+    h2 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--text-main); }
+    .card { padding: 24px; border: 1px solid rgba(0,0,0,0.04); }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="logo" style="text-decoration:none;">🍴 Foodify</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="userhome.html">Restaurants</a></li>
+      <li><a href="cart.html" class="active">Orders</a></li>
+      <li><a href="about.html">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+         <a href="login.html" class="nav-btn-text">Log in</a>
+         <a href="signup.html" class="nav-btn-text">Sign up</a>
+    </div>
+  </nav>
+
+  <div class="wrap">
+    <div class="grid">
+      <!-- LEFT: Menu & Cart -->
+      <main>
+        <section class="card slide-up">
+          <h2>Trending Menu Items</h2>
+          <p style="color:var(--text-muted); margin-bottom: 20px;">Top picks for you. Add them to your cart!</p>
+
+          <div id="menu" class="menu">
+            <!-- Mock Items -->
+          </div>
+        </section>
+
+        <div style="height:32px"></div>
+
+        <section class="card slide-up" style="animation-delay: 0.1s;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Your Cart</h2>
+            <button id="clearBtn" class="btn btn-sm" style="background: #fee2e2; color: #ef4444; padding: 6px 14px; font-size: 0.85rem;">Clear Cart</button>
+          </div>
+          
+          <div id="cartWrap">
+            <div id="cartList" class="cart-list"></div>
+            <div id="emptyState" style="padding: 40px; text-align: center; color: var(--text-muted); display: none;">
+              <p>Your cart is empty 😕</p>
+              <p style="font-size: 0.9rem;">Add some delicious food from the menu above!</p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- RIGHT: Summary & Checkout -->
+      <aside class="card slide-up" style="animation-delay: 0.2s; height: fit-content; position: sticky; top: 100px;">
+        <h2>Order Summary</h2>
+
+        <div class="summary">
+          <div class="row"><span>Items</span><span id="itemsCount">0</span></div>
+          <div class="row"><span>Subtotal</span><span id="subtotal">₹0.00</span></div>
+          <div class="row"><span>Delivery Fee</span><span id="delivery">₹40.00</span></div>
+          <div class="row"><span>Taxes (5%)</span><span id="taxes">₹0.00</span></div>
+
+          <div class="row total"><span>Total</span><span id="total">₹0.00</span></div>
+
+          <div>
+             <label for="promo" style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Promo Code</label>
+             <div style="display: flex; gap: 8px;">
+               <input id="promo" placeholder="Enter code">
+               <button class="btn" style="padding: 10px 20px;">Apply</button>
+             </div>
+          </div>
+
+          <button id="checkoutBtn" class="btn checkout-btn">Proceed to Checkout</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+  
+  <div id="toast" class="toast">
+    <span id="toastIcon">🛒</span>
+    <span id="toastMessage">Item added to cart</span>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 Foodify</p>
+  </footer>
+
+  <script>
+    // Data
+    const menuItems = [
+      { id: 101, name: "Margherita Pizza", price: 299, desc: "Classic cheese and basil", img: "./assets/pizza.png" },
+      { id: 102, name: "Chicken Burger", price: 199, desc: "Crispy chicken with spicy mayo", img: "./assets/burgers.png" },
+      { id: 103, name: "Hyderabadi Biryani", price: 349, desc: "Authentic dum biryani", img: "./assets/briyani.png" },
+      { id: 104, name: "Chocolate Brownie", price: 129, desc: "Served with vanilla ice cream", img: "./assets/sweets.png" },
+      { id: 105, name: "Pasta Alfredo", price: 249, desc: "Creamy white sauce with mushrooms", img: "./assets/pasta.png" },
+      { id: 106, name: "Caesar Salad", price: 189, desc: "Fresh lettuce with parmesan and croutons", img: "./assets/salads.png" },
+      { id: 107, name: "Cappuccino", price: 149, desc: "Hot brewed coffee with foam", img: "./assets/Beverages.png" },
+      { id: 108, name: "Hakka Noodles", price: 219, desc: "Stir-fried veg noodles", img: "./assets/noodels.png" },
+    ];
+
+    // State
+    let cart = [];
+    
+    // Init
+    function init() {
+      const menuEl = document.getElementById('menu');
+      menuItems.forEach(item => {
+        const el = document.createElement('div');
+        el.className = "dish";
+        el.innerHTML = `
+          <div class="img"><img src="${item.img}" alt="${item.name}"></div>
+          <div style="flex:1;">
+            <div style="font-weight:700;">${item.name}</div>
+            <div style="font-size:0.85rem; color:var(--text-muted);">${item.desc}</div>
+            <div style="font-weight:600; color:var(--primary); margin-top:4px;">₹${item.price}</div>
+          </div>
+          <button class="btn" style="padding: 8px 16px; font-size: 0.9rem;" onclick="addToCart(${item.id})">Add</button>
+        `;
+        menuEl.appendChild(el);
+      });
+      loadCart();
+      renderCart();
+    }
+
+    // Cart Logic
+    function addToCart(id) {
+      const item = menuItems.find(i => i.id === id);
+      const existing = cart.find(i => i.id === id);
+      if (existing) {
+        existing.qty++;
+      } else {
+        cart.push({ ...item, qty: 1 });
+      }
+      saveCart();
+      renderCart();
+      showToast(`${item.name} added!`);
+    }
+
+    function removeFromCart(id) {
+       cart = cart.filter(i => i.id !== id);
+       saveCart();
+       renderCart();
+    }
+    
+    function updateQty(id, delta) {
+      const item = cart.find(i => i.id === id);
+      if(item) {
+        item.qty += delta;
+        if(item.qty <= 0) removeFromCart(id);
+        else {
+          saveCart();
+          renderCart();
+        }
+      }
+    }
+
+    function renderCart() {
+      const list = document.getElementById('cartList');
+      const empty = document.getElementById('emptyState');
+      
+      list.innerHTML = "";
+      if (cart.length === 0) {
+        list.style.display = 'none';
+        empty.style.display = 'block';
+      } else {
+        list.style.display = 'flex';
+        empty.style.display = 'none';
+        
+        cart.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'cart-item';
+          div.innerHTML = `
+            <div class="img"><img src="${item.img}" alt="${item.name}"></div>
+            <div style="flex:1">
+               <div style="font-weight:600">${item.name}</div>
+               <div style="font-size:0.9rem; color:var(--primary)">₹${item.price}</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+               <button onclick="updateQty(${item.id}, -1)" style="width:28px; height:28px; border-radius:50%; border:1px solid #ccc; background:white; cursor:pointer;">-</button>
+               <span style="font-weight:600; width:20px; text-align:center;">${item.qty}</span>
+               <button onclick="updateQty(${item.id}, 1)" style="width:28px; height:28px; border-radius:50%; border:1px solid #ccc; background:white; cursor:pointer;">+</button>
+            </div>
+          `;
+          list.appendChild(div);
+        });
+      }
+      calculateTotals();
+    }
+
+    function calculateTotals() {
+      const subtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+      const taxes = subtotal * 0.05;
+      const delivery = subtotal > 0 ? 40 : 0;
+      const total = subtotal + taxes + delivery;
+
+      document.getElementById('itemsCount').textContent = cart.reduce((acc, i) => acc + i.qty, 0);
+      document.getElementById('subtotal').textContent = `₹${subtotal.toFixed(2)}`;
+      document.getElementById('taxes').textContent = `₹${taxes.toFixed(2)}`;
+      document.getElementById('delivery').textContent = `₹${delivery.toFixed(2)}`;
+      document.getElementById('total').textContent = `₹${total.toFixed(2)}`;
+    }
+
+    function saveCart() { localStorage.setItem('foodify_cart', JSON.stringify(cart)); }
+    function loadCart() { cart = JSON.parse(localStorage.getItem('foodify_cart') || "[]"); }
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      cart = [];
+      saveCart();
+      renderCart();
+      showToast("Cart cleared");
+    });
+    
+    document.getElementById('checkoutBtn').addEventListener('click', () => {
+       if(cart.length === 0) {
+         showToast("Cart is empty!");
+         return;
+       }
+       alert("Proceeding to payment gateway... (Mock)");
+    });
+
+    // Toast
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMessage');
+    function showToast(msg) {
+      toastMsg.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+    
+    // Navbar Scroll
+    window.addEventListener('scroll', () => {
+        const nav = document.getElementById('navbar');
+        if(window.scrollY > 10) nav.classList.add('scrolled');
+        else nav.classList.remove('scrolled');
+    });
+
+    init();
+  </script>
+</body>
+</html>

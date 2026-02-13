@@ -1,0 +1,487 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Order - Foodify{% endblock %}
+
+{% block content %}
+<style>
+    .my-order-page {
+        max-width: 1400px;
+        margin: 110px auto 80px;
+        padding: 0 30px;
+    }
+    .page-header {
+        margin-bottom: 35px;
+    }
+    .page-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 8px;
+        color: var(--text-main);
+    }
+    .page-subtitle {
+        color: var(--text-muted);
+        font-size: 1.05rem;
+    }
+    .order-cart-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 35px;
+        align-items: start;
+    }
+    
+    /* Orders Section */
+    .orders-section {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        padding: 0;
+        overflow: hidden;
+    }
+    .section-title {
+        padding: 25px 30px;
+        border-bottom: 2px solid #f5f5f5;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(to bottom, #fff, #fafafa);
+    }
+    .section-title h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: var(--text-main);
+    }
+    .view-all-link {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+    }
+    .view-all-link:hover {
+        color: var(--primary-dark);
+        transform: translateX(3px);
+    }
+    .orders-content {
+        padding: 25px 30px;
+        max-height: 550px;
+        overflow-y: auto;
+    }
+    .order-mini-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border-left: 4px solid var(--primary);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 18px;
+        transition: all 0.3s;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .order-mini-card:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .order-mini-card:last-child {
+        margin-bottom: 0;
+    }
+    .order-mini-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+    .order-mini-id {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--text-main);
+    }
+    .order-mini-details {
+        color: var(--text-muted);
+        font-size: 0.92rem;
+        line-height: 1.6;
+    }
+    .order-mini-details p {
+        margin: 5px 0;
+    }
+    .order-price {
+        font-weight: 700;
+        color: var(--primary);
+        font-size: 1.05rem;
+    }
+    
+    /* Cart Section */
+    .cart-section {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+        position: sticky;
+        top: 90px;
+    }
+    .cart-items-wrapper {
+        max-height: 320px;
+        overflow-y: auto;
+        padding: 25px 30px;
+        border-bottom: 2px solid #f5f5f5;
+    }
+    .cart-item {
+        display: flex;
+        gap: 18px;
+        padding: 18px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .cart-item:first-child {
+        padding-top: 0;
+    }
+    .cart-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+    .cart-item-image {
+        width: 85px;
+        height: 85px;
+        object-fit: cover;
+        border-radius: 12px;
+        flex-shrink: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+    }
+    .cart-item-details {
+        flex: 1;
+    }
+    .cart-item-name {
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: var(--text-main);
+        margin-bottom: 4px;
+    }
+    .cart-item-restaurant {
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+    }
+    .cart-item-price-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .cart-item-price {
+        font-weight: 600;
+        color: var(--primary);
+        font-size: 1.05rem;
+    }
+    .qty-controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .qty-btn {
+        width: 32px;
+        height: 32px;
+        border: 2px solid #e0e0e0;
+        background: white;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-main);
+        transition: all 0.2s;
+    }
+    .qty-btn:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        transform: scale(1.1);
+    }
+    .qty-number {
+        font-weight: 700;
+        min-width: 25px;
+        text-align: center;
+    }
+    .remove-item-btn {
+        background: none;
+        border: none;
+        color: #e74c3c;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 0;
+        transition: all 0.2s;
+    }
+    .remove-item-btn:hover {
+        color: #c0392b;
+        text-decoration: underline;
+    }
+    
+    /* Checkout Section */
+    .checkout-section {
+        padding: 25px 30px 30px;
+        background: #fafafa;
+    }
+    .checkout-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 18px;
+        color: var(--text-main);
+    }
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 0.95rem;
+    }
+    .summary-row.total {
+        border-top: 2px solid #ddd;
+        padding-top: 15px;
+        margin-top: 15px;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+    .checkout-form {
+        margin-top: 25px;
+    }
+    .form-field {
+        margin-bottom: 18px;
+    }
+    .form-label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--text-main);
+        font-size: 0.92rem;
+    }
+    .form-input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-family: inherit;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+    }
+    .form-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+    }
+    .place-order-btn {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, var(--primary) 0%, #ff4757 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.15rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    }
+    .place-order-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 60px 30px;
+        color: var(--text-muted);
+    }
+    .empty-icon {
+        font-size: 4.5rem;
+        margin-bottom: 20px;
+        opacity: 0.7;
+    }
+    .empty-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: var(--text-main);
+    }
+    .empty-text {
+        margin-bottom: 25px;
+    }
+    
+    /* Scrollbar Styling */
+    .orders-content::-webkit-scrollbar,
+    .cart-items-wrapper::-webkit-scrollbar {
+        width: 8px;
+    }
+    .orders-content::-webkit-scrollbar-track,
+    .cart-items-wrapper::-webkit-scrollbar-track {
+        background: #f5f5f5;
+        border-radius: 10px;
+    }
+    .orders-content::-webkit-scrollbar-thumb,
+    .cart-items-wrapper::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 10px;
+    }
+    .orders-content::-webkit-scrollbar-thumb:hover,
+    .cart-items-wrapper::-webkit-scrollbar-thumb:hover {
+        background: #999;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .order-cart-grid {
+            grid-template-columns: 1fr;
+        }
+        .cart-section {
+            position: static;
+        }
+    }
+</style>
+
+<div class="my-order-page">
+    <div class="page-header">
+        <h1>My Order & Cart</h1>
+        <p class="page-subtitle">Track your orders and manage your cart in one place</p>
+    </div>
+    
+    <div class="order-cart-grid">
+        <!-- LEFT: MY ORDERS -->
+        <div class="orders-section">
+            <div class="section-title">
+                <h2>📦 Recent Orders</h2>
+                <a href="{% url 'orders:order_history' %}" class="view-all-link">View All →</a>
+            </div>
+            
+            <div class="orders-content">
+                {% if recent_orders %}
+                    {% for order in recent_orders %}
+                    <div class="order-mini-card">
+                        <div class="order-mini-header">
+                            <span class="order-mini-id">Order #{{ order.id }}</span>
+                            <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+                        </div>
+                        <div class="order-mini-details">
+                            <p>📅 {{ order.created_at|date:"d M Y, g:i A" }}</p>
+                            <p>🍽️ {{ order.items.count }} item{{ order.items.count|pluralize }} • <span class="order-price">₹{{ order.grand_total }}</span></p>
+                        </div>
+                        <a href="{% url 'orders:order_detail' order.id %}" class="btn" style="margin-top: 12px; padding: 10px 20px; font-size: 0.9rem; display: inline-block; text-decoration: none;">
+                            View Details
+                        </a>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon">📦</div>
+                        <div class="empty-title">No Orders Yet</div>
+                        <p class="empty-text">Start ordering delicious food!</p>
+                        <a href="{% url 'restaurants:list' %}" class="btn" style="text-decoration: none;">Browse Restaurants</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- RIGHT: CART -->
+        <div class="cart-section">
+            <div class="section-title">
+                <h2>🛒 Shopping Cart</h2>
+                {% if cart_items %}
+                    <form method="post" action="{% url 'orders:clear_cart' %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="view-all-link" style="background: none; border: none; cursor: pointer;">
+                            Clear All
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+            
+            {% if cart_items %}
+                <div class="cart-items-wrapper">
+                    {% for item in cart_items %}
+                    <div class="cart-item">
+                        {% if item.menu_item.image %}
+                            <img src="{{ item.menu_item.image.url }}" alt="{{ item.menu_item.name }}" class="cart-item-image">
+                        {% else %}
+                            <div class="cart-item-image">🍽️</div>
+                        {% endif %}
+                        
+                        <div class="cart-item-details">
+                            <div class="cart-item-name">{{ item.menu_item.name }}</div>
+                            <div class="cart-item-restaurant">{{ item.menu_item.restaurant.name }}</div>
+                            
+                            <div class="cart-item-price-row">
+                                <span class="cart-item-price">₹{{ item.subtotal }}</span>
+                                <div class="qty-controls">
+                                    <form method="post" action="{% url 'orders:update_cart' item.id %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="decrease">
+                                        <button type="submit" class="qty-btn">−</button>
+                                    </form>
+                                    <span class="qty-number">{{ item.quantity }}</span>
+                                    <form method="post" action="{% url 'orders:update_cart' item.id %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="increase">
+                                        <button type="submit" class="qty-btn">+</button>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <form method="post" action="{% url 'orders:remove_from_cart' item.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="remove-item-btn">🗑️ Remove</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Checkout -->
+                <div class="checkout-section">
+                    <div class="checkout-title">Order Summary</div>
+                    
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span>₹{{ subtotal }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Delivery Fee</span>
+                        <span>₹{{ delivery_fee }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Tax (5%)</span>
+                        <span>₹{{ tax }}</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <span>₹{{ total }}</span>
+                    </div>
+                    
+                    <form method="post" action="{% url 'orders:place_order' %}" class="checkout-form">
+                        {% csrf_token %}
+                        <div class="form-field">
+                            <label class="form-label">📍 Delivery Address</label>
+                            <textarea name="delivery_address" rows="2" required class="form-input">{{ user.profile.address }}</textarea>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">📱 Phone Number</label>
+                            <input type="tel" name="phone" value="{{ user.profile.phone }}" required class="form-input">
+                        </div>
+                        <button type="submit" class="place-order-btn">
+                            Place Order • ₹{{ total }}
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">🛒</div>
+                    <div class="empty-title">Cart is Empty</div>
+                    <p class="empty-text">Add some delicious items!</p>
+                    <a href="{% url 'restaurants:list' %}" class="btn" style="text-decoration: none;">Browse Restaurants</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

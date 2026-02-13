@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Order #{{ order.id }} - Foodify{% endblock %}
+
+{% block content %}
+<style>
+    .order-detail-container {
+        max-width: 900px;
+        margin: 120px auto 60px;
+        padding: 0 20px;
+    }
+    .detail-card {
+        background: white;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        margin-bottom: 20px;
+    }
+    .status-timeline {
+        display: flex;
+        justify-content: space-between;
+        margin: 30px 0;
+        position: relative;
+    }
+    .timeline-step {
+        flex: 1;
+        text-align: center;
+        position: relative;
+    }
+    .timeline-step::before {
+        content: '';
+        position: absolute;
+        top: 15px;
+        left: 50%;
+        right: -50%;
+        height: 2px;
+        background: #ddd;
+        z-index: 0;
+    }
+    .timeline-step:last-child::before {
+        display: none;
+    }
+    .timeline-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #ddd;
+        margin: 0 auto 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 1;
+    }
+    .timeline-step.active .timeline-icon {
+        background: var(--primary);
+        color: white;
+    }
+    .order-items-list {
+        margin-top: 20px;
+    }
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+</style>
+
+<div class="order-detail-container">
+    <a href="{% url 'orders:order_history' %}" style="display: inline-block; margin-bottom: 20px; color: var(--primary);">← Back to Orders</a>
+    
+    <h1>Order #{{ order.id }}</h1>
+    
+    <div class="detail-card">
+        <h2>Order Status</h2>
+        <div style="text-align: center; padding: 20px;">
+            <span class="order-status status-{{ order.status }}" style="font-size: 1.1rem; padding: 10px 20px;">
+                {{ order.get_status_display }}
+            </span>
+        </div>
+        
+        <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+            <div>
+                <div class="info-label">Order Date</div>
+                <div class="info-value">{{ order.created_at|date:"d M Y, g:i A" }}</div>
+            </div>
+            <div>
+                <div class="info-label">Phone</div>
+                <div class="info-value">{{ order.phone }}</div>
+            </div>
+            <div>
+                <div class="info-label">Delivery Address</div>
+                <div class="info-value">{{ order.delivery_address }}</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="detail-card">
+        <h2>Order Items</h2>
+        <div class="order-items-list">
+            {% for item in order_items %}
+            <div class="order-item">
+                <div>
+                    <strong>{{ item.menu_item.name }}</strong>
+                    <p style="color: var(--text-muted); margin: 4px 0;">{{ item.menu_item.restaurant.name }}</p>
+                    <p style="margin: 4px 0;">₹{{ item.price }} × {{ item.quantity }}</p>
+                </div>
+                <div style="text-align: right;">
+                    <strong style="color: var(--primary);">₹{{ item.subtotal }}</strong>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #f0f0f0;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>Subtotal</span>
+                <span>₹{{ order.total_amount }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>Delivery Fee</span>
+                <span>₹{{ order.delivery_fee|default:"40.00" }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>Tax (5%)</span>
+                <span>₹{{ order.tax_amount|default:"0.00" }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700; color: var(--primary); padding-top: 10px; border-top: 2px solid #ddd;">
+                <span>Total</span>
+                <span>₹{{ grand_total }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

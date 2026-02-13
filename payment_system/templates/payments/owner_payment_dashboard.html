@@ -1,0 +1,171 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Dashboard - Foodify</title>
+    <link rel="stylesheet" href="{% static 'css/payments.css' %}">
+</head>
+<body>
+    <div class="payment-container">
+        <!-- Header -->
+        <div class="payment-header">
+            <h1>💰 Payment Dashboard</h1>
+            <p>Manage and track all payment transactions for your restaurant(s)</p>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card success">
+                <div class="stat-card-title">Total Revenue</div>
+                <div class="stat-card-value">₹{{ total_revenue|floatformat:2 }}</div>
+                <div class="stat-card-subtitle">From {{ total_transactions }} completed transactions</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-card-title">Total Orders</div>
+                <div class="stat-card-value">{{ total_transactions }}</div>
+                <div class="stat-card-subtitle">Successfully completed</div>
+            </div>
+            
+            <div class="stat-card warning">
+                <div class="stat-card-title">Pending Payments</div>
+                <div class="stat-card-value">{{ pending_payments }}</div>
+                <div class="stat-card-subtitle">Awaiting confirmation</div>
+            </div>
+            
+            <div class="stat-card danger">
+                <div class="stat-card-title">Failed Payments</div>
+                <div class="stat-card-value">{{ failed_payments }}</div>
+                <div class="stat-card-subtitle">Requires attention</div>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        {% if unread_notifications %}
+        <div class="payment-card">
+            <h3 style="margin-bottom: 16px;">
+                🔔 Recent Notifications
+                <span class="notification-badge">{{ unread_notifications|length }}</span>
+            </h3>
+            {% for notification in unread_notifications %}
+            <div class="notification-item unread">
+                <div class="notification-title">{{ notification.title }}</div>
+                <div class="notification-message">{{ notification.message|linebreaks }}</div>
+                <div class="notification-time">{{ notification.created_at|timesince }} ago</div>
+                <a href="{% url 'payments:mark_notification_read' notification.id %}" style="font-size: 0.875rem; color: var(--primary-color);">Mark as read</a>
+            </div>
+            {% endfor %}
+            <a href="{% url 'payments:notifications' %}" class="btn-secondary" style="margin-top: 10px;">View All Notifications</a>
+        </div>
+        {% endif %}
+
+        <!-- Filters -->
+        <div class="filter-bar">
+            <form method="get" style="display: flex; gap: 15px; flex-wrap: wrap; flex: 1;">
+                {% if restaurants|length > 1 %}
+                <div class="filter-group">
+                    <label>Restaurant</label>
+                    <select name="restaurant">
+                        <option value="">All Restaurants</option>
+                        {% for restaurant in restaurants %}
+                            <option value="{{ restaurant.id }}" {% if selected_restaurant.id == restaurant.id %}selected{% endif %}>
+                                {{ restaurant.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+                
+                <div class="filter-group">
+                    <label>Status</label>
+                    <select name="status">
+                        <option value="">All Statuses</option>
+                        {% for value, label in status_choices %}
+                            <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>From Date</label>
+                    <input type="date" name="date_from">
+                </div>
+                
+                <div class="filter-group">
+                    <label>To Date</label>
+                    <input type="date" name="date_to">
+                </div>
+                
+                <div style="align-self: flex-end;">
+                    <button type="submit" class="filter-btn">Apply Filters</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Transactions Table -->
+        <div class="payment-card">
+            <h3 style="margin-bottom: 20px;">Recent Transactions</h3>
+            {% if transactions %}
+                <table class="payment-table">
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            {% if restaurants|length > 1 %}
+                            <th>Restaurant</th>
+                            {% endif %}
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in transactions %}
+                        <tr>
+                            <td class="transaction-id">{{ transaction.transaction_id }}</td>
+                            <td><strong>#{{ transaction.order.id }}</strong></td>
+                            <td>
+                                {{ transaction.customer.get_full_name|default:transaction.customer.username }}<br>
+                                <small style="color: var(--text-gray);">{{ transaction.customer.email }}</small>
+                            </td>
+                            {% if restaurants|length > 1 %}
+                            <td>{{ transaction.restaurant.name }}</td>
+                            {% endif %}
+                            <td class="amount">₹{{ transaction.amount }}</td>
+                            <td>
+                                <span class="status-badge status-{{ transaction.status }}">
+                                    {{ transaction.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ transaction.created_at|date:"d M Y, g:i A" }}</td>
+                            <td>
+                                <a href="{% url 'payments:payment_detail' transaction.id %}" class="btn-secondary" style="padding: 6px 12px; font-size: 0.875rem;">
+                                    View Details
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">📊</div>
+                    <h3>No Transactions Yet</h3>
+                    <p>Payment transactions will appear here once customers start ordering.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Back Button -->
+        <div class="text-center mt-20">
+            <a href="{% url 'restaurants:owner_dashboard' %}" class="btn-secondary">← Back to Restaurant Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>

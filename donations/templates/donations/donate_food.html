@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Donate Food - Foodify{% endblock %}
+
+{% block content %}
+<div class="container"
+    style="max-width: 600px; margin: 40px auto; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <h2 style="color: var(--primary); text-align: center; margin-bottom: 20px;">Share the Joy: Donate Food</h2>
+    <p style="text-align: center; color: #666; margin-bottom: 30px;">Your small contribution can make a big difference
+        in someone's life.</p>
+
+    <form method="POST" style="display: flex; flex-direction: column; gap: 15px;">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}"
+                style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">
+                {{ field.label }}
+            </label>
+            {{ field.errors }}
+            <div style="width: 100%;">
+                {% if field.name == 'food_name' or field.name == 'quantity' or field.name == 'phone' %}
+                <input type="{{ field.field.widget.input_type|default:'text' }}" name="{{ field.name }}"
+                    id="{{ field.id_for_label }}"
+                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;"
+                    placeholder="{{ field.help_text|striptags }}">
+                {% elif field.name == 'category' %}
+                <select name="{{ field.name }}" id="{{ field.id_for_label }}"
+                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                    {% for val, name in field.field.choices %}
+                    <option value="{{ val }}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+                {% elif field.name == 'address' or field.name == 'description' %}
+                <textarea name="{{ field.name }}" id="{{ field.id_for_label }}" rows="3"
+                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;"
+                    placeholder="{{ field.help_text|striptags }}"></textarea>
+                {% elif field.name == 'expiry_time' %}
+                <input type="datetime-local" name="{{ field.name }}" id="{{ field.id_for_label }}"
+                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                {% else %}
+                {{ field }}
+                {% endif %}
+            </div>
+            {% if field.help_text %}
+            <small style="color: #888; display: block; margin-top: 4px;">{{ field.help_text }}</small>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="btn-primary"
+            style="margin-top: 10px; padding: 12px; border: none; border-radius: 6px; background: var(--primary); color: white; font-weight: bold; cursor: pointer; transition: background 0.3s;">
+            Submit Donation
+        </button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us - Foodify{% endblock %}
+
+{% block content %}
+<style>
+    .contact-container {
+        max-width: 1000px;
+        margin: 120px auto 60px;
+        padding: 0 20px;
+    }
+    .contact-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+    .contact-header h1 {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        color: var(--text-main);
+    }
+    .contact-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 40px;
+        margin-bottom: 60px;
+    }
+    .contact-card {
+        background: white;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        text-align: center;
+        transition: transform 0.3s;
+    }
+    .contact-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+    .contact-icon {
+        font-size: 3rem;
+        margin-bottom: 20px;
+    }
+    .contact-card h3 {
+        margin: 15px 0;
+        color: var(--text-main);
+    }
+    .contact-card p {
+        color: var(--text-muted);
+        margin: 10px 0;
+    }
+    .contact-form {
+        background: white;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+    }
+    .form-group {
+        margin-bottom: 25px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--text-main);
+    }
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #cfcfcf;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-family: inherit;
+    }
+    .form-group textarea {
+        min-height: 150px;
+        resize: vertical;
+    }
+    .btn-submit {
+        width: 100%;
+        padding: 14px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .btn-submit:hover {
+        background: var(--primary-dark);
+    }
+</style>
+
+<div class="contact-container">
+    <div class="contact-header">
+        <h1>Get In Touch</h1>
+        <p style="font-size: 1.2rem; color: var(--text-muted);">We'd love to hear from you! Reach out to us anytime.</p>
+    </div>
+
+    <div class="contact-grid">
+        <div class="contact-card">
+            <div class="contact-icon">📞</div>
+            <h3>Call Us</h3>
+            <p>+91 98765 43210</p>
+            <p>Mon-Sun: 9AM - 11PM</p>
+        </div>
+        <div class="contact-card">
+            <div class="contact-icon">✉️</div>
+            <h3>Email Us</h3>
+            <p>support@foodify.com</p>
+            <p>We'll respond within 24 hours</p>
+        </div>
+        <div class="contact-card">
+            <div class="contact-icon">📍</div>
+            <h3>Visit Us</h3>
+            <p>123 Food Street</p>
+            <p>Mumbai, Maharashtra 400001</p>
+        </div>
+    </div>
+
+    <div class="contact-form">
+        <h2 style="margin-bottom: 30px; text-align: center;">Send Us a Message</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name">Your Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="subject">Subject</label>
+                <input type="text" id="subject" name="subject" required>
+            </div>
+            <div class="form-group">
+                <label for="message">Message</label>
+                <textarea id="message" name="message" required></textarea>
+            </div>
+            <button type="submit" class="btn-submit">Send Message</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

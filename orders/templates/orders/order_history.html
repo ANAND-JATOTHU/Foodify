@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders - Foodify{% endblock %}
+
+{% block content %}
+<style>
+    .orders-container {
+        max-width: 1000px;
+        margin: 120px auto 60px;
+        padding: 0 20px;
+    }
+    .order-card {
+        background: white;
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        margin-bottom: 20px;
+        transition: transform 0.3s;
+    }
+    .order-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lg);
+    }
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    .order-id {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+    .order-status {
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-confirmed { background: #d1ecf1; color: #0c5460; }
+    .status-preparing { background: #cce5ff; color: #004085; }
+    .status-out_for_delivery { background: #d4edda; color: #155724; }
+    .status-delivered { background: #d4edda; color: #155724; }
+    .status-cancelled { background: #f8d7da; color: #721c24; }
+    .order-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 15px 0;
+    }
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+    .info-label {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+    }
+    .info-value {
+        font-weight: 600;
+        color: var(--text-main);
+    }
+</style>
+
+<div class="orders-container">
+    <h1>My Orders</h1>
+    <p style="color: var(--text-muted); margin-bottom: 30px;">Track all your orders here</p>
+    
+    {% if orders %}
+        {% for order in orders %}
+        <div class="order-card">
+            <div class="order-header">
+                <span class="order-id">Order #{{ order.id }}</span>
+                <span class="order-status status-{{ order.status }}">
+                    {{ order.get_status_display }}
+                </span>
+            </div>
+            
+            <div class="order-info">
+                <div class="info-item">
+                    <span class="info-label">Order Date</span>
+                    <span class="info-value">{{ order.created_at|date:"d M Y, g:i A" }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Total Amount</span>
+                    <span class="info-value">₹{{ order.grand_total }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Items</span>
+                    <span class="info-value">{{ order.items.count }} item{{ order.items.count|pluralize }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Delivery Address</span>
+                    <span class="info-value">{{ order.delivery_address|truncatewords:10 }}</span>
+                </div>
+            </div>
+            
+            <div style="margin-top: 15px;">
+                <a href="{% url 'orders:order_detail' order.id %}" class="btn" style="width: 100%; text-align: center;">View Details</a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div style="text-align: center; padding: 80px 20px; background: white; border-radius: 16px;">
+            <div style="font-size: 5rem; margin-bottom: 20px;">📦</div>
+            <h2>No orders yet</h2>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">Start ordering some delicious food!</p>
+            <a href="{% url 'restaurants:list' %}" class="btn">Browse Restaurants</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

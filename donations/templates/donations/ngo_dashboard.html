@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}NGO Dashboard - Foodify{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1000px; margin: 40px auto; padding: 20px;">
+    <h2 style="color: var(--primary); margin-bottom: 30px;">NGO Dashboard</h2>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+        <!-- Available Donations -->
+        <div>
+            <h3>Available for Rescue</h3>
+            {% if available_donations %}
+            {% for donation in available_donations %}
+            <div
+                style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h4>{{ donation.food_name }} ({{ donation.get_category_display }})</h4>
+                <p><strong>Quantity:</strong> {{ donation.quantity }}</p>
+                <p><strong>Location:</strong> {{ donation.address }}</p>
+                <p><strong>Restaurant:</strong> {% if donation.restaurant %}{{ donation.restaurant.name }}{% else %}{{
+                    donation.donor.username }}{% endif %}</p>
+                <a href="{% url 'donations:request_pickup' donation.id %}" class="nav-btn-primary"
+                    style="display: inline-block; text-decoration: none; text-align: center; margin-top: 10px;">Reserve
+                    Now</a>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>No available donations at the moment.</p>
+            {% endif %}
+        </div>
+
+        <!-- My Reserved Donations -->
+        <div>
+            <h3>My Active Pickups</h3>
+            {% if my_reserved_donations or my_collected_donations %}
+            {% for donation in my_reserved_donations %}
+            <div
+                style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h4>{{ donation.food_name }}</h4>
+                <p><strong>Status:</strong> <span style="color: #3b82f6;">{{ donation.get_status_display }}</span></p>
+                <p><strong>Phone:</strong> {{ donation.phone }}</p>
+                <p><strong>Address:</strong> {{ donation.address }}</p>
+                <a href="{% url 'donations:mark_collected' donation.id %}" class="nav-btn-text"
+                    style="display: inline-block; margin-top: 10px; border: 1px solid var(--primary); color: var(--primary);">Mark
+                    as Collected</a>
+            </div>
+            {% endfor %}
+
+            {% for donation in my_collected_donations %}
+            <div
+                style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); opacity: 0.8;">
+                <h4>{{ donation.food_name }}</h4>
+                <p><strong>Status:</strong> <span style="color: #10b981;">Collected</span></p>
+                <p style="color: #10b981; font-weight: bold; margin-top: 10px;">✓ Pickup Completed</p>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>You haven't reserved or collected any donations yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

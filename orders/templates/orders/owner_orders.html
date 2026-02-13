@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Management - Foodify{% endblock %}
+
+{% block content %}
+<style>
+    .owner-orders-container {
+        max-width: 1400px;
+        margin: 100px auto 60px;
+        padding: 0 20px;
+    }
+    .orders-table {
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    thead {
+        background: var(--primary);
+        color: white;
+    }
+    th, td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    th {
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+    }
+    tbody tr:hover {
+        background: #f9f9f9;
+    }
+    .status-dropdown {
+        padding: 6px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: white;
+        cursor: pointer;
+    }
+    .update-btn {
+        padding: 6px 16px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+    }
+    .update-btn:hover {
+        background: var(--primary-dark);
+    }
+    .order-details-btn {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 600;
+    }
+    @media (max-width: 968px) {
+        .orders-table {
+            overflow-x: auto;
+        }
+        table {
+            min-width: 800px;
+        }
+    }
+</style>
+
+<div class="owner-orders-container">
+    <h1>Order Management</h1>
+    <p style="color: var(--text-muted); margin-bottom: 30px;">Manage all orders for your restaurants</p>
+    
+    {% if orders %}
+    <div class="orders-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Restaurant</th>
+                    <th>Items</th>
+                    <th>Total Amount</th>
+                    <th>Delivery Address</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td><strong>#{{ order.id }}</strong></td>
+                    <td>{{ order.user.username }}</td>
+                    <td>{{ order.restaurant.name }}</td>
+                    <td>{{ order.items.count }} item{{ order.items.count|pluralize }}</td>
+                    <td><strong>₹{{ order.grand_total }}</strong></td>
+                    <td>
+                        <div style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ order.delivery_address }}">
+                            {{ order.delivery_address|truncatewords:8 }}
+                        </div>
+                    </td>
+                    <td>{{ order.created_at|date:"d M Y" }}<br><small style="color: var(--text-muted);">{{ order.created_at|date:"g:i A" }}</small></td>
+                    <td>
+                        <form method="post" action="{% url 'orders:update_order_status' order.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <select name="status" class="status-dropdown status-{{ order.status }}" onchange="this.form.submit()">
+                                {% for value, label in order.STATUS_CHOICES %}
+                                    <option value="{{ value }}" {% if order.status == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </td>
+                    <td>
+                        <a href="{% url 'orders:owner_order_detail' order.id %}" class="order-details-btn">View Details →</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="background: white; padding: 60px; text-align: center; border-radius: 16px; box-shadow: var(--shadow-md);">
+        <div style="font-size: 4rem; margin-bottom: 20px;">📦</div>
+        <h2>No Orders Yet</h2>
+        <p style="color: var(--text-muted);">Orders will appear here once customers start ordering from your restaurants.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Auto-submit form when status changes (already handled by onchange, but adding confirmation)
+document.querySelectorAll('.status-dropdown').forEach(select => {
+    select.addEventListener('change', function(e) {
+        if (!confirm('Update order status?')) {
+            e.preventDefault();
+            this.selectedIndex = Array.from(this.options).findIndex(opt => opt.selected);
+        }
+    });
+});
+</script>
+{% endblock %}

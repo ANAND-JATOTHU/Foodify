@@ -1,0 +1,890 @@
+{% extends 'base.html' %}
+
+{% block title %}Login / Sign Up - Foodify{% endblock %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+    
+    /* Reset and Food-Themed Variables */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    :root {
+        --food-primary: #FFB4A2;
+        --food-dark: #FF8A65;
+        --food-teal: #FFCCBC;
+        --food-accent: #FFAB91;
+        --food-light: #FFE0D6;
+        --cream: #FFF8F5;
+        --warm-bg: #FFFAF8;
+    }
+    
+    /* Warm Food-Themed Animated Background */
+    body {
+        font-family: 'Poppins', sans-serif;
+        min-height: 100vh;
+        background: linear-gradient(-45deg, #FFF8F5, #FFE0D6, #FFCCBC, #FFD7C5);
+        background-size: 400% 400%;
+        animation: foodGradient 15s ease infinite;
+        position: relative;
+        overflow-x: hidden;
+    }
+    
+    @keyframes foodGradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    
+    /* Food Pattern Overlay */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    /* Animated Food Items Background */
+    .food-items-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        pointer-events: none;
+        overflow: hidden;
+    }
+    
+    .food-item {
+        position: absolute;
+        font-size: 6rem;
+        opacity: 0;
+        animation: floatFood 25s infinite;
+        filter: drop-shadow(0 8px 20px rgba(255, 138, 101, 0.35));
+    }
+    
+    @keyframes floatFood {
+        0% {
+            transform: translateY(100vh) translateX(-50px) rotate(0deg) scale(0.5);
+            opacity: 0;
+        }
+        10% {
+            opacity: 0.8;
+        }
+        50% {
+            transform: translateY(50vh) translateX(50px) rotate(180deg) scale(1);
+            opacity: 0.8;
+        }
+        90% {
+            opacity: 0.8;
+        }
+        100% {
+            transform: translateY(-100px) translateX(100px) rotate(360deg) scale(0.5);
+            opacity: 0;
+        }
+    }
+    
+    /* Bouncing Food Items on Sides */
+    .food-decoration {
+        position: absolute;
+        font-size: 6rem;
+        animation: bounce 3s ease-in-out infinite;
+        filter: drop-shadow(0 15px 30px rgba(255, 138, 101, 0.3));
+        z-index: 5;
+    }
+    
+    @keyframes bounce {
+        0%, 100% {
+            transform: translateY(0) rotate(0deg);
+        }
+        50% {
+            transform: translateY(-20px) rotate(10deg);
+        }
+    }
+    
+    .food-left-top {
+        top: 10%;
+        left: 5%;
+        animation-delay: 0s;
+    }
+    
+    .food-right-top {
+        top: 15%;
+        right: 5%;
+        animation-delay: 1s;
+    }
+    
+    .food-left-bottom {
+        bottom: 15%;
+        left: 8%;
+        animation-delay: 2s;
+    }
+    
+    .food-right-bottom {
+        bottom: 10%;
+        right: 8%;
+        animation-delay: 1.5s;
+    }
+    
+    /* Premium Glassmorphism Container */
+    .auth-wrapper {
+        position: relative;
+        z-index: 10;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+    }
+    
+    .auth-container {
+        max-width: 500px;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+        border-radius: 35px;
+        border: 3px solid rgba(255, 138, 101, 0.22);
+        box-shadow: 
+            0 20px 60px rgba(255, 138, 101, 0.2),
+            0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+        padding: 50px 45px;
+        animation: slideInScale 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    @keyframes slideInScale {
+        0% {
+            opacity: 0;
+            transform: translateY(100px) scale(0.8);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+    
+    /* Decorative Food Border Animation */
+    .auth-container::after {
+        content: '🍕 🍔 🌮 🍜 🍰 🍕 🍔 🌮 🍜 🍰';
+        position: absolute;
+        top: -20px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 1.5rem;
+        animation: slideFood 20s linear infinite;
+        opacity: 0.6;
+    }
+    
+    @keyframes slideFood {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+    
+    /* Premium Logo Design */
+    .auth-logo {
+        text-align: center;
+        margin-bottom: 35px;
+        animation: fadeInBounce 1s ease 0.2s both;
+        position: relative;
+    }
+    
+    .auth-logo h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--food-primary) 0%, var(--food-accent) 50%, var(--food-dark) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 8px;
+        filter: drop-shadow(0 4px 8px rgba(0, 200, 83, 0.3));
+        animation: logoGlow 3s ease-in-out infinite;
+    }
+    
+    @keyframes logoGlow {
+        0%, 100% {
+            filter: drop-shadow(0 4px 8px rgba(255, 138, 101, 0.3));
+        }
+        50% {
+            filter: drop-shadow(0 8px 16px rgba(255, 138, 101, 0.45));
+        }
+    }
+    
+    .auth-logo p {
+        color: #666;
+        font-size: 1rem;
+        font-weight: 400;
+    }
+    
+    @keyframes fadeInBounce {
+        0% {
+            opacity: 0;
+            transform: translateY(-40px);
+        }
+        60% {
+            transform: translateY(5px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Food-Themed Tab Navigation */
+    .auth-tabs {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 35px;
+        background: linear-gradient(135deg, rgba(255, 180, 162, 0.15), rgba(255, 204, 188, 0.15));
+        padding: 10px;
+        border-radius: 25px;
+        position: relative;
+        animation: fadeIn 0.8s ease 0.4s both;
+        border: 2px solid rgba(255, 138, 101, 0.25);
+    }
+    
+    .auth-tab {
+        flex: 1;
+        padding: 14px 25px;
+        text-align: center;
+        cursor: pointer;
+        font-weight: 700;
+        color: var(--food-primary);
+        border-radius: 20px;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        z-index: 1;
+        font-size: 1.05rem;
+    }
+    
+    .auth-tab.active {
+        background: linear-gradient(135deg, var(--food-orange) 0%, var(--food-red) 100%);
+        color: white;
+        box-shadow: 0 8px 25px rgba(255, 138, 101, 0.35);
+        transform: scale(1.05);
+    }
+    
+    .auth-tab:hover:not(.active) {
+        background: rgba(255, 180, 162, 0.2);
+        transform: translateY(-3px);
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    
+    /* Form Styling */
+    .auth-form {
+        display: none;
+        position: relative;
+    }
+    
+    .auth-form.active {
+        display: block;
+        animation: formAppear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    
+    @keyframes formAppear {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .form-group {
+        margin-bottom: 25px;
+        position: relative;
+        animation: slideInLeft 0.6s ease both;
+    }
+    
+    .form-group:nth-child(1) { animation-delay: 0.5s; }
+    .form-group:nth-child(2) { animation-delay: 0.6s; }
+    .form-group:nth-child(3) { animation-delay: 0.7s; }
+    .form-group:nth-child(4) { animation-delay: 0.8s; }
+    .form-group:nth-child(5) { animation-delay: 0.9s; }
+    .form-group:nth-child(6) { animation-delay: 1s; }
+    
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: #444;
+        font-size: 0.95rem;
+        letter-spacing: 0.3px;
+        transition: all 0.3s ease;
+    }
+    
+    .input-wrapper {
+        position: relative;
+    }
+    
+    /* Food Icon in Input */
+    .input-wrapper::before {
+        content: '🍽️';
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.2rem;
+        z-index: 1;
+        transition: all 0.3s ease;
+    }
+    
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 15px 20px 15px 50px;
+        background: white;
+        border: 3px solid rgba(255, 107, 53, 0.2);
+        border-radius: 18px;
+        font-size: 1rem;
+        color: #333;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        background: #FFF8E7;
+        border-color: var(--food-orange);
+        box-shadow: 
+            0 0 0 5px rgba(255, 138, 101, 0.12),
+            0 10px 30px rgba(255, 138, 101, 0.2);
+        transform: translateY(-3px);
+    }
+    
+    .form-group input:focus ~ label,
+    .input-wrapper:focus-within::before {
+        color: var(--food-orange);
+        transform: translateY(-50%) scale(1.2);
+    }
+    
+    .form-group input::placeholder {
+        color: #999;
+        font-weight: 400;
+    }
+    
+    /* Password Toggle with Food Theme */
+    .password-toggle {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        font-size: 1.3rem;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        z-index: 10;
+    }
+    
+    .password-toggle:hover {
+        transform: translateY(-50%) scale(1.3) rotate(10deg);
+    }
+    
+    /* Radio Groups - Food Themed */
+    .radio-group {
+        display: flex;
+        gap: 12px;
+        margin-top: 12px;
+    }
+    
+    .radio-group label {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+        padding: 14px 20px;
+        background: linear-gradient(135deg, rgba(255, 180, 162, 0.08), rgba(255, 204, 188, 0.08));
+        border: 3px solid rgba(255, 107, 53, 0.2);
+        border-radius: 15px;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        color: #555;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    .radio-group label:hover {
+        background: linear-gradient(135deg, rgba(255, 180, 162, 0.18), rgba(255, 204, 188, 0.18));
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(255, 138, 101, 0.22);
+    }
+    
+    .radio-group input[type="radio"]:checked + label,
+    .radio-group label:has(input[type="radio"]:checked) {
+        background: linear-gradient(135deg, var(--food-primary) 0%, var(--food-accent) 100%);
+        color: white;
+        border-color: var(--food-orange);
+        transform: scale(1.05);
+        box-shadow: 0 10px 25px rgba(255, 138, 101, 0.3);
+    }
+    
+    /* Premium Food-Themed Submit Button */
+    .btn-submit {
+        width: 100%;
+        padding: 18px;
+        background: linear-gradient(135deg, var(--food-orange) 0%, var(--food-red) 100%);
+        color: white;
+        border: none;
+        border-radius: 18px;
+        font-size: 1.15rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 
+            0 10px 30px rgba(255, 138, 101, 0.3),
+            0 0 0 0 rgba(255, 138, 101, 0.35);
+        position: relative;
+        overflow: hidden;
+        letter-spacing: 1px;
+        margin-top: 15px;
+        animation: slideInLeft 0.6s ease 1.1s both;
+    }
+    
+    .btn-submit::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.3),
+            transparent
+        );
+        transition: left 0.6s ease;
+    }
+    
+    .btn-submit:hover::before {
+        left: 100%;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-5px);
+        box-shadow: 
+            0 15px 40px rgba(255, 138, 101, 0.35),
+            0 0 30px rgba(255, 138, 101, 0.3);
+        animation: buttonPulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes buttonPulse {
+        0%, 100% {
+            box-shadow: 
+                0 15px 40px rgba(255, 138, 101, 0.35),
+                0 0 30px rgba(255, 138, 101, 0.3);
+        }
+        50% {
+            box-shadow: 
+                0 20px 50px rgba(255, 138, 101, 0.45),
+                0 0 40px rgba(255, 138, 101, 0.4);
+        }
+    }
+    
+    .btn-submit:active {
+        transform: translateY(-2px);
+    }
+    
+    /* Ripple Effect - Food Themed */
+    .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 204, 188, 0.75);
+        transform: scale(0);
+        animation: ripple-animation 0.6s ease-out;
+        pointer-events: none;
+    }
+    
+    @keyframes ripple-animation {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 576px) {
+        .auth-container {
+            padding: 40px 30px;
+            margin: 20px;
+        }
+        
+        .auth-logo h1 {
+            font-size: 2.8rem;
+        }
+        
+        .radio-group {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .food-item {
+            font-size: 4rem;
+        }
+        
+        .food-decoration {
+            font-size: 4.5rem;
+        }
+    }
+    
+    /* Accessibility */
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+</style>
+
+<!-- Floating Food Items Background -->
+<div class="food-items-bg" id="food-bg"></div>
+
+<!-- Corner Food Decorations -->
+<div class="food-decoration food-left-top">🍕</div>
+<div class="food-decoration food-right-top">🍔</div>
+<div class="food-decoration food-left-bottom">🌮</div>
+<div class="food-decoration food-right-bottom">🍰</div>
+
+<div class="auth-wrapper">
+    <div class="auth-container">
+        <!-- Logo/Brand -->
+        <div class="auth-logo">
+            <h1>🍕 Foodify</h1>
+            <p>Your favorite meals, delivered fresh</p>
+        </div>
+        
+        <!-- Tab Navigation -->
+        <div class="auth-tabs">
+            <div class="auth-tab active" onclick="switchTab('login')">🔐 Login</div>
+            <div class="auth-tab" onclick="switchTab('signup')">✨ Sign Up</div>
+        </div>
+
+        <!-- Login Form -->
+        <form method="post" class="auth-form active" id="login-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="login-username">Username</label>
+                <div class="input-wrapper">
+                    <input type="text" id="login-username" name="username" placeholder="Enter your username" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <div class="input-wrapper">
+                    <input type="password" id="login-password" name="password" placeholder="Enter your password" required>
+                    <span class="password-toggle" onclick="togglePassword('login-password', this)">👁️</span>
+                </div>
+            </div>
+            <button type="submit" name="login" class="btn-submit" onclick="createRipple(event)">🚀 Login Now</button>
+        </form>
+
+        <!-- Signup Form -->
+        <form method="post" class="auth-form" id="signup-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>I am a:</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="user_type" value="customer" checked onchange="toggleDeliveryFields()">
+                        👤 Customer
+                    </label>
+                    <label>
+                        <input type="radio" name="user_type" value="restaurant_owner" onchange="toggleDeliveryFields()">
+                        🏪 Owner
+                    </label>
+                    <label>
+                        <input type="radio" name="user_type" value="delivery_agent" onchange="toggleDeliveryFields()">
+                        🚴 Delivery Agent
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Delivery Agent Specific Fields (hidden by default) -->
+            <div id="delivery-agent-fields" style="display: none;">
+                <div class="form-group">
+                    <label for="full-name">Full Name <span style="color: red;">*</span></label>
+                    <div class="input-wrapper">
+                        <input type="text" id="full-name" name="full_name" placeholder="Enter your full name">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="signup-username">Username</label>
+                <div class="input-wrapper">
+                    <input type="text" id="signup-username" name="username" placeholder="Choose a cool username" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="signup-email">Email</label>
+                <div class="input-wrapper">
+                    <input type="email" id="signup-email" name="email" placeholder="your.email@foodify.com" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="signup-phone">Phone <span id="phone-required" style="color: red; display: none;">*</span></label>
+                <div class="input-wrapper">
+                    <input type="tel" id="signup-phone" name="phone" placeholder="10 digits" maxlength="10">
+                </div>
+            </div>
+            
+            <!-- More Delivery Agent Fields -->
+            <div id="delivery-agent-fields-2" style="display: none;">
+                <div class="form-group">
+                    <label for="address">Address <span style="color: red;">*</span></label>
+                    <div class="input-wrapper">
+                        <input type="text" id="address" name="address" placeholder="Enter your address" style="padding-left: 50px;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="vehicle-type">Vehicle Type <span style="color: red;">*</span></label>
+                    <div class="input-wrapper">
+                        <select id="vehicle-type" name="vehicle_type" style="padding-left: 50px;">
+                            <option value="">Select Vehicle</option>
+                            <option value="bike">Bike</option>
+                            <option value="scooter">Scooter</option>
+                            <option value="cycle">Cycle</option>
+                            <option value="car">Car</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="vehicle-number">Vehicle Number <span style="color: red;">*</span></label>
+                    <div class="input-wrapper">
+                        <input type="text" id="vehicle-number" name="vehicle_number" placeholder="e.g., MH-01-AB-1234" style="padding-left: 50px;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="driving-license">Driving License Number <span style="color: red;">*</span></label>
+                    <div class="input-wrapper">
+                        <input type="text" id="driving-license" name="driving_license" placeholder="License number" style="padding-left: 50px;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Availability Status <span style="color: red;">*</span></label>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="availability_status" value="True" checked>
+                            ✅ Available
+                        </label>
+                        <label>
+                            <input type="radio" name="availability_status" value="False">
+                            ⛔ Not Available
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="signup-password1">Password</label>
+                <div class="input-wrapper">
+                    <input type="password" id="signup-password1" name="password1" placeholder="Create a strong password" required>
+                    <span class="password-toggle" onclick="togglePassword('signup-password1', this)">👁️</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="signup-password2">Confirm Password</label>
+                <div class="input-wrapper">
+                    <input type="password" id="signup-password2" name="password2" placeholder="Confirm your password" required>
+                    <span class="password-toggle" onclick="togglePassword('signup-password2', this)">👁️</span>
+                </div>
+            </div>
+            
+            <!-- ID Proof Upload for Delivery Agents -->
+            <div id="delivery-agent-fields-3" style="display: none;">
+                <div class="form-group">
+                    <label for="id-proof">Upload ID Proof (Optional)</label>
+                    <div class="input-wrapper">
+                        <input type="file" id="id-proof" name="id_proof" accept=".pdf,.jpg,.jpeg,.png" style="padding: 10px;">
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" name="signup" class="btn-submit" onclick="createRipple(event)">🎉 Create Account</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Tab Switching with Animation
+    function switchTab(tab) {
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+        
+        if (tab === 'login') {
+            document.querySelector('.auth-tab:first-child').classList.add('active');
+            document.getElementById('login-form').classList.add('active');
+        } else {
+            document.querySelector('.auth-tab:last-child').classList.add('active');
+            document.getElementById('signup-form').classList.add('active');
+        }
+    }
+    
+    // Password Toggle
+    function togglePassword(inputId, icon) {
+        const input = document.getElementById(inputId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.textContent = '🙈';
+        } else {
+            input.type = 'password';
+            icon.textContent = '👁️';
+        }
+    }
+    
+    // Enhanced Ripple Effect
+    function createRipple(event) {
+        const button = event.currentTarget;
+        const ripple = document.createElement('span');
+        const rect = button.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = event.clientX - rect.left - size / 2;
+        const y = event.clientY - rect.top - size / 2;
+        
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        ripple.classList.add('ripple');
+        
+        button.appendChild(ripple);
+        
+        setTimeout(() => ripple.remove(), 600);
+    }
+    
+    // Create Floating Food Items
+    function createFoodItems() {
+        const container = document.getElementById('food-bg');
+        const foodEmojis = [
+            '🍕', '🍔', '🍟', '🌮', '🍱', '🍜', 
+            '🍰', '🍩', '🥗', '🍝', '🥙', '🌯',
+            '🍗', '🥘', '🍲', '🥞', '🧁', '🍦'
+        ];
+        const itemCount = 35;
+        
+        for (let i = 0; i < itemCount; i++) {
+            const item = document.createElement('div');
+            item.classList.add('food-item');
+            item.textContent = foodEmojis[Math.floor(Math.random() * foodEmojis.length)];
+            item.style.left = Math.random() * 100 + '%';
+            item.style.animationDelay = Math.random() * 25 + 's';
+            item.style.animationDuration = (20 + Math.random() * 10) + 's';
+            item.style.fontSize = (2 + Math.random() * 2) + 'rem';
+            container.appendChild(item);
+        }
+    }
+    
+    // Animate Input Icons on Focus
+    function animateInputIcons() {
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', function() {
+                const wrapper = this.closest('.input-wrapper');
+                if (wrapper) {
+                    wrapper.classList.add('focused');
+                }
+            });
+            
+            input.addEventListener('blur', function() {
+                const wrapper = this.closest('.input-wrapper');
+                if (wrapper) {
+                    wrapper.classList.remove('focused');
+                }
+            });
+        });
+    }
+    
+    // Initialize Everything
+    document.addEventListener('DOMContentLoaded', function() {
+        createFoodItems();
+        animateInputIcons();
+        
+        // Add subtle shake to corner decorations
+        const decorations = document.querySelectorAll('.food-decoration');
+        decorations.forEach((dec, index) => {
+            setInterval(() => {
+                dec.style.animation = 'none';
+                setTimeout(() => {
+                    dec.style.animation = 'bounce 3s ease-in-out infinite';
+                }, 10);
+            }, 3000 + (index * 500));
+        });
+    });
+    
+    // Toggle Delivery Agent Fields
+    function toggleDeliveryFields() {
+        const userType = document.querySelector('input[name="user_type"]:checked').value;
+        const deliveryFields1 = document.getElementById('delivery-agent-fields');
+        const deliveryFields2 = document.getElementById('delivery-agent-fields-2');
+        const deliveryFields3 = document.getElementById('delivery-agent-fields-3');
+        const phoneRequired = document.getElementById('phone-required');
+        const phoneInput = document.getElementById('signup-phone');
+        
+        if (userType === 'delivery_agent') {
+            deliveryFields1.style.display = 'block';
+            deliveryFields2.style.display = 'block';
+            deliveryFields3.style.display = 'block';
+            phoneRequired.style.display = 'inline';
+            phoneInput.required = true;
+            phoneInput.placeholder = '10 digits (Required)';
+            
+            // Make delivery agent fields required
+            document.getElementById('full-name').required = true;
+            document.getElementById('address').required = true;
+            document.getElementById('vehicle-type').required = true;
+            document.getElementById('vehicle-number').required = true;
+            document.getElementById('driving-license').required = true;
+        } else {
+            deliveryFields1.style.display = 'none';
+            deliveryFields2.style.display = 'none';
+            deliveryFields3.style.display = 'none';
+            phoneRequired.style.display = 'none';
+            phoneInput.required = false;
+            phoneInput.placeholder = '10 digits';
+            
+            // Make delivery agent fields not required
+            if (document.getElementById('full-name')) {
+                document.getElementById('full-name').required = false;
+                document.getElementById('address').required = false;
+                document.getElementById('vehicle-type').required = false;
+                document.getElementById('vehicle-number').required = false;
+                document.getElementById('driving-license').required = false;
+            }
+        }
+    }
+</script>
+{% endblock %}

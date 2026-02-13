@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment History - Foodify</title>
+    <link rel="stylesheet" href="{% static 'css/payments.css' %}">
+</head>
+<body>
+    <div class="payment-container">
+        <!-- Header -->
+        <div class="payment-header">
+            <h1>💳 Payment History</h1>
+            <p>View all your payment transactions and order details</p>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="filter-bar">
+            <form method="get" style="display: flex; gap: 15px; flex-wrap: wrap; flex: 1;">
+                <div class="search-bar">
+                    <input type="text" name="search" placeholder="Search by Order ID or Transaction ID..." value="{{ search_query }}">
+                </div>
+                
+                <div class="filter-group">
+                    <select name="status">
+                        <option value="">All Statuses</option>
+                        {% for value, label in status_choices %}
+                            <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <button type="submit" class="filter-btn">Apply Filters</button>
+            </form>
+        </div>
+
+        <!-- Transactions List -->
+        {% if transactions %}
+            <div class="payment-card">
+                <table class="payment-table">
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Order ID</th>
+                            <th>Restaurant</th>
+                            <th>Amount</th>
+                            <th>Payment Method</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in transactions %}
+                        <tr>
+                            <td class="transaction-id">{{ transaction.transaction_id }}</td>
+                            <td><strong>#{{ transaction.order.id }}</strong></td>
+                            <td>{{ transaction.restaurant.name|default:"N/A" }}</td>
+                            <td class="amount">₹{{ transaction.amount }}</td>
+                            <td style="text-transform: capitalize;">{{ transaction.payment_method }}</td>
+                            <td>
+                                <span class="status-badge status-{{ transaction.status }}">
+                                    {{ transaction.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ transaction.created_at|date:"d M Y, g:i A" }}</td>
+                            <td>
+                                <a href="{% url 'payments:payment_detail' transaction.id %}" class="btn-secondary" style="padding: 6px 12px; font-size: 0.875rem;">
+                                    View Details
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">📭</div>
+                <h3>No Transactions Found</h3>
+                <p>You haven't made any payments yet.</p>
+                <a href="{% url 'restaurants:list' %}" class="btn-primary">Start Shopping</a>
+            </div>
+        {% endif %}
+
+        <!-- Back Button -->
+        <div class="text-center mt-20">
+            <a href="{% url 'accounts:user_home' %}" class="btn-secondary">← Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,508 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Food Donations - Foodify{% endblock %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    :root {
+        --primary: #FF6B00;
+        --primary-dark: #E55A00;
+        --success: #22c55e;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --text: #1f2937;
+        --text-muted: #6b7280;
+        --border: #e5e7eb;
+        --bg-light: #f9fafb;
+    }
+    
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #FFF8F5 0%, #FFE0D6 100%);
+        min-height: 100vh;
+    }
+    
+    .donations-hero {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        padding: 80px 20px 60px;
+        text-align: center;
+        margin-top: 60px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .donations-hero::before {
+        content: '🍲';
+        position: absolute;
+        font-size: 200px;
+        opacity: 0.1;
+        top: -50px;
+        right: 10%;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(10deg); }
+    }
+    
+    .donations-hero h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .donations-hero p {
+        font-size: 1.2rem;
+        opacity: 0.95;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .container-custom {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    /* Search & Filters */
+    .search-section {
+        background: white;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+        margin: -40px auto 40px;
+        max-width: 1200px;
+        position: relative;
+        z-index: 10;
+    }
+    
+    .search-bar {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .search-input {
+        flex: 1;
+        padding: 15px 20px;
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(255,107,0,0.1);
+    }
+    
+    .search-btn {
+        padding: 15px 40px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .search-btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255,107,0,0.3);
+    }
+    
+    .filters-toggle {
+        background: var(--bg-light);
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        color: var(--text);
+        transition: all 0.3s;
+    }
+    
+    .filters-toggle:hover {
+        background: var(--border);
+    }
+    
+    .filters-panel {
+        display: none;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+    }
+    
+    .filters-panel.active {
+        display: grid;
+    }
+    
+    .filter-group label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: var(--text);
+    }
+    
+    .filter-group select,
+    .filter-group input {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid var(--border);
+        border-radius: 8px;
+        font-size: 0.95rem;
+    }
+    
+    /* Donation Cards Grid */
+    .donations-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+    }
+    
+    .donation-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: all 0.3s;
+        position: relative;
+        cursor: pointer;
+    }
+    
+    .donation-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    }
+    
+    .donation-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        background: linear-gradient(135deg, #FFE0D6 0%, #FFCCBC 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+    }
+    
+    .donation-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: white;
+        text-transform: uppercase;
+    }
+    
+    .badge-available { background: var(--success); }
+    .badge-booked { background: var(--warning); }
+    .badge-collected { background: var(--text-muted); }
+    
+    .veg-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        width: 28px;
+        height: 28px;
+        background: white;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .veg-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+    }
+    
+    .veg { background: #22c55e; }
+    .non-veg { background:#ef4444; }
+    
+    .donation-content {
+        padding: 20px;
+    }
+    
+    .donation-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 10px;
+    }
+    
+    .donation-meta {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+    }
+    
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+    
+    .meta-item strong {
+        color: var(--text);
+    }
+    
+    .donation-description {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin-bottom: 15px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .donation-location {
+        display: flex;
+        align-items: start;
+        gap: 8px;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+        padding-top: 15px;
+        border-top: 1px solid var(--border);
+    }
+    
+    .donation-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 15px;
+        border-top: 1px solid var(--border);
+    }
+    
+    .time-badge {
+        background: var(--bg-light);
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+    
+    .book-btn {
+        padding: 10px 24px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .book-btn:hover {
+        background: var(--primary-dark);
+        transform: scale(1.05);
+    }
+    
+    .book-btn:disabled {
+        background: var(--text-muted);
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        color: var(--text-muted);
+    }
+    
+    .empty-state-icon {
+        font-size: 5rem;
+        margin-bottom: 20px;
+        opacity: 0.5;
+    }
+    
+    @media (max-width: 768px) {
+        .donations-hero h1 {
+            font-size: 2rem;
+        }
+        
+        .search-bar {
+            flex-direction: column;
+        }
+        
+        .donations-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="donations-hero">
+    <div class="container-custom">
+        <h1>🍽️ Food Donations</h1>
+        <p>Help reduce food waste! Browse available food donations from restaurants and individuals, ready for pickup by NGOs and community members.</p>
+    </div>
+</div>
+
+<div class="container-custom">
+    <!-- Search & Filters -->
+    <div class="search-section">
+        <form method="GET" action="{% url 'donations:donation_list' %}">
+            <div class="search-bar">
+                <input 
+                    type="text" 
+                    name="search" 
+                    class="search-input" 
+                    placeholder="Search for food items (e.g., Rice, Biryani, Vegetables)..."
+                    value="{{ search_query|default:'' }}"
+                >
+                <button type="submit" class="search-btn">🔍 Search</button>
+                <button type="button" class="filters-toggle" onclick="toggleFilters()">
+                    ⚙️ Filters
+                </button>
+            </div>
+            
+            <div class="filters-panel" id="filtersPanel">
+                <div class="filter-group">
+                    <label>Food Type</label>
+                    <select name="food_type">
+                        <option value="">All Types</option>
+                        <option value="veg" {% if food_type == 'veg' %}selected{% endif %}>Vegetarian</option>
+                        <option value="non-veg" {% if food_type == 'non-veg' %}selected{% endif %}>Non-Vegetarian</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Category</label>
+                    <select name="category">
+                        <option value="">All Categories</option>
+                        <option value="cooked" {% if category == 'cooked' %}selected{% endif %}>Cooked Food</option>
+                        <option value="raw" {% if category == 'raw' %}selected{% endif %}>Raw Materials</option>
+                        <option value="packaged" {% if category == 'packaged' %}selected{% endif %}>Packaged Food</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Minimum Servings</label>
+                    <input type="number" name="min_serving" placeholder="e.g., 10" value="{{ min_serving|default:'' }}">
+                </div>
+                
+                <div class="filter-group">
+                    <label>Status</label>
+                    <select name="status">
+                        <option value="">All Status</option>
+                        <option value="available" {% if status == 'available' %}selected{% endif %}>Available</option>
+                        <option value="booked" {% if status == 'booked' %}selected{% endif %}>Booked</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Donation Cards -->
+    {% if donations %}
+    <div class="donations-grid">
+        {% for donation in donations %}
+        <div class="donation-card" onclick="window.location.href='{% url 'donations:donation_detail' donation.id %}'">
+            <div class="donation-image">
+                {% if donation.image %}
+                <img src="{{ donation.image.url }}" alt="{{ donation.food_name }}" style="width:100%;height:100%;object-fit:cover;">
+                {% else %}
+                <span>🍲</span>
+                {% endif %}
+            </div>
+            
+            <!-- Status Badge -->
+            <div class="donation-badge badge-{{ donation.status }}">
+                {{ donation.get_status_display }}
+            </div>
+            
+            <!-- Veg/Non-Veg Indicator -->
+            <div class="veg-badge">
+                <div class="veg-dot {% if donation.food_type == 'veg' %}veg{% else %}non-veg{% endif %}"></div>
+            </div>
+            
+            <div class="donation-content">
+                <h3 class="donation-title">{{ donation.food_name }}</h3>
+                
+                <div class="donation-meta">
+                    <div class="meta-item">
+                        <span>📦</span>
+                        <strong>{{ donation.quantity_description }}</strong>
+                    </div>
+                    {% if donation.serving_count %}
+                    <div class="meta-item">
+                        <span>👥</span>
+                        <strong>{{ donation.serving_count }} servings</strong>
+                    </div>
+                    {% endif %}
+                    {% if donation.weight_kg %}
+                    <div class="meta-item">
+                        <span>⚖️</span>
+                        <strong>{{ donation.weight_kg }} kg</strong>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% if donation.description %}
+                <p class="donation-description">{{ donation.description }}</p>
+                {% endif %}
+                
+                <div class="donation-location">
+                    <span>📍</span>
+                    <span>{{ donation.address|truncatewords:10 }}</span>
+                </div>
+                
+                <div class="donation-footer">
+                    <div class="time-badge">
+                        🕒 {{ donation.created_at|timesince }} ago
+                    </div>
+                    
+                    {% if donation.is_available %}
+                    <button class="book-btn" onclick="event.stopPropagation(); window.location.href='{% url 'donations:book_donation' donation.id %}'">
+                        Book Now
+                    </button>
+                    {% else %}
+                    <button class="book-btn" disabled>
+                        {% if donation.is_booked %}Booked{% else %}Unavailable{% endif %}
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">🍽️</div>
+        <h2>No donations available at the moment</h2>
+        <p>Check back later or try adjusting your search filters</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function toggleFilters() {
+    const panel = document.getElementById('filtersPanel');
+    panel.classList.toggle('active');
+}
+</script>
+
+{% endblock %}

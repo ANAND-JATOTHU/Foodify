@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Foodify - Delicious Food Delivery{% endblock %}
+
+{% block content %}
+<style>
+  /* CSS Custom Properties */
+  :root {
+    --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Hero Section */
+  .hero {
+    position: relative;
+    height: 90vh;
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
+                url("{% static 'assets/hero.png' %}") no-repeat center center/cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+  }
+  
+  .hero-content {
+    position: relative;
+    z-index: 10;
+    max-width: 800px;
+    padding: 20px;
+  }
+  
+  .hero h1 {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    font-weight: 800;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    line-height: 1.1;
+    animation: slideUp 0.8s var(--ease-bounce);
+  }
+  
+  .hero p {
+    font-size: 1.25rem;
+    margin-bottom: 2.5rem;
+    opacity: 0.9;
+    animation: slideUp 0.8s var(--ease-bounce) 0.2s backwards;
+  }
+
+  /* Cuisine Carousel */
+  .cuisine-section {
+    background: #f8f8f8;
+    padding: 60px 0;
+    overflow: hidden;
+  }
+  
+  .cuisine-title {
+    text-align: center;
+    margin-bottom: 40px;
+    font-size: 2rem;
+    color: var(--text-main);
+  }
+  
+  .carousel-container {
+    display: flex;
+    gap: 32px;
+    overflow-x: auto;
+    padding: 20px 5%;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+  }
+  
+  .carousel-container::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .cuisine-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 120px;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  
+  .cuisine-item:hover {
+    transform: scale(1.05);
+  }
+  
+  .cuisine-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 12px;
+  }
+  
+  .cuisine-name {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-main);
+  }
+
+  @media (max-width: 768px) {
+    .hero h1 {
+      font-size: 2.5rem;
+    }
+    .hero p {
+      font-size: 1rem;
+    }
+  }
+</style>
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>Delicious Food,<br>Delivered To You</h1>
+    <p>Order your favorite meals from the best restaurants in town with just a few clicks.</p>
+    <a href="{% url 'restaurants:list' %}" class="btn">Order Now</a>
+  </div>
+</section>
+
+<!-- Cuisine Carousel -->
+<section class="cuisine-section">
+  <h2 class="cuisine-title">Inspiration for your first order</h2>
+  <div class="carousel-container">
+    <div class="cuisine-item" onclick="location.href='{% url 'restaurants:list' %}'">
+      <img src="{% static 'assets/briyani.png' %}" alt="Biryani" class="cuisine-img">
+      <span class="cuisine-name">Biryani</span>
+    </div>
+    <div class="cuisine-item" onclick="location.href='{% url 'restaurants:list' %}'">
+      <img src="{% static 'assets/pizza.png' %}" alt="Pizza" class="cuisine-img">
+      <span class="cuisine-name">Pizza</span>
+    </div>
+    <div class="cuisine-item" onclick="location.href='{% url 'restaurants:list' %}'">
+      <img src="{% static 'assets/burgers.png' %}" alt="Burger" class="cuisine-img">
+      <span class="cuisine-name">Burger</span>
+    </div>
+    <div class="cuisine-item" onclick="location.href='{% url 'restaurants:list' %}'">
+      <img src="{% static 'assets/noodels.png' %}" alt="Chinese" class="cuisine-img">
+      <span class="cuisine-name">Chinese</span>
+    </div>
+    <div class="cuisine-item" onclick="location.href='{% url 'restaurants:list' %}'">
+      <img src="{% static 'assets/sweets.png' %}" alt="Cake" class="cuisine-img">
+      <span class="cuisine-name">Cake</span>
+    </div>
+    <div class="cuisine-item" onclick="location.href='{% url 'restaurants:list' %}'">
+      <img src="{% static 'assets/pasta.png' %}" alt="Pasta" class="cuisine-img">
+      <span class="cuisine-name">Pasta</span>
+    </div>
+    <div class="cuisine-item" onclick="location.href='{% url 'restaurants:list' %}'">
+      <img src="{% static 'assets/salads.png' %}" alt="Salad" class="cuisine-img">
+      <span class="cuisine-name">Salad</span>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Cards -->
+<section class="cards container">
+  <div class="card fade-on-scroll">
+    <img src="{% static 'assets/pizza.png' %}" alt="Pizza" loading="lazy"/>
+    <div class="card-content">
+      <h3>Pizza Specials</h3>
+      <p>Hot and cheesy pizzas from top restaurants.</p>
+      <a href="{% url 'restaurants:list' %}" class="btn">Explore</a>
+    </div>
+  </div>
+  <div class="card fade-on-scroll">
+    <img src="{% static 'assets/burgers.png' %}" alt="Burger" loading="lazy" />
+    <div class="card-content">
+      <h3>Burgers & Fries</h3>
+      <p>Delicious combos to satisfy your cravings.</p>
+      <a href="{% url 'restaurants:list' %}" class="btn">Explore</a>
+    </div>
+  </div>
+  <div class="card fade-on-scroll">
+    <img src="{% static 'assets/briyani.png' %}" alt="Biryani" loading="lazy" />
+    <div class="card-content">
+      <h3>Biryani Feast</h3>
+      <p>Aromatic biryanis from authentic kitchens.</p>
+      <a href="{% url 'restaurants:list' %}" class="btn">Explore</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Scroll Reveal Animation
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('slide-up');
+        entry.target.style.opacity = 1;
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-on-scroll').forEach(el => {
+    el.style.opacity = 0; 
+    observer.observe(el);
+  });
+</script>
+{% endblock %}

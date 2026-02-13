@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Foodify</title>
+    <link rel="stylesheet" href="{% static 'css/payments.css' %}">
+</head>
+<body>
+    <div class="payment-container">
+        <!-- Header -->
+        <div class="payment-header">
+            <h1>🔔 Payment Notifications</h1>
+            <p>Stay updated with all your payment and order notifications</p>
+        </div>
+
+        <!-- Actions -->
+        <div class="payment-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <strong>{{ unread_notifications|length }}</strong> unread notification{{ unread_notifications|length|pluralize }}
+                </div>
+                {% if unread_notifications %}
+                <a href="{% url 'payments:mark_all_read' %}" class="btn-primary">Mark All as Read</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Filter -->
+        <div class="filter-bar">
+            <form method="get" style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <div class="filter-group">
+                    <label>Filter by Type</label>
+                    <select name="type">
+                        <option value="">All Types</option>
+                        {% for value, label in notification_types %}
+                            <option value="{{ value }}" {% if type_filter == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div style="align-self: flex-end;">
+                    <button type="submit" class="filter-btn">Apply Filter</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Unread Notifications -->
+        {% if unread_notifications %}
+        <div class="payment-card">
+            <h3 style="margin-bottom: 16px;">Unread Notifications</h3>
+            {% for notification in unread_notifications %}
+            <div class="notification-item unread">
+                <div class="notification-title">{{ notification.title }}</div>
+                <div class="notification-message">{{ notification.message|linebreaks }}</div>
+                <div class="notification-time">{{ notification.created_at|timesince }} ago</div>
+                <div style="margin-top: 10px;">
+                    <a href="{% url 'payments:mark_notification_read' notification.id %}" class="btn-primary" style="padding: 6px 12px; font-size: 0.875rem;">Mark as Read</a>
+                    <a href="{% url 'payments:payment_detail' notification.transaction.id %}" class="btn-secondary" style="padding: 6px 12px; font-size: 0.875rem;">View Transaction</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Read Notifications -->
+        {% if read_notifications %}
+        <div class="payment-card">
+            <h3 style="margin-bottom: 16px;">Read Notifications</h3>
+            {% for notification in read_notifications %}
+            <div class="notification-item read">
+                <div class="notification-title">{{ notification.title }}</div>
+                <div class="notification-message">{{ notification.message|linebreaks }}</div>
+                <div class="notification-time">{{ notification.created_at|timesince }} ago</div>
+                <div style="margin-top: 10px;">
+                    <a href="{% url 'payments:payment_detail' notification.transaction.id %}" class="btn-secondary" style="padding: 6px 12px; font-size: 0.875rem;">View Transaction</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Empty State -->
+        {% if not unread_notifications and not read_notifications %}
+        <div class="empty-state">
+            <div class="empty-state-icon">🔕</div>
+            <h3>No Notifications</h3>
+            <p>You don't have any notifications yet.</p>
+        </div>
+        {% endif %}
+
+        <!-- Back Button -->
+        <div class="text-center mt-20">
+            <a href="{% url 'accounts:user_home' %}" class="btn-secondary">← Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>
