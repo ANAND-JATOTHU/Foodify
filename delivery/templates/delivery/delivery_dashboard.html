@@ -6,69 +6,40 @@
 {% block content %}
 <style>
     .dashboard-container {
-        max-width: 1200px;
-        margin: 100px auto 60px;
-        padding: 0 20px;
+        max-width: 1400px;
+        margin: 90px auto 60px;
+        padding: 0 24px;
     }
 
-    .dashboard-header {
+    .dashboard-top {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 40px;
+        margin-bottom: 32px;
     }
 
-    .dashboard-header h1 {
+    .dashboard-title {
+        font-size: 2rem;
+        font-weight: 700;
         color: var(--text-main);
         margin: 0;
     }
 
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
-        margin-bottom: 40px;
-    }
-
-    .stat-card {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-        color: white;
-        padding: 30px;
-        border-radius: 16px;
-        box-shadow: var(--shadow-md);
-    }
-
-    .stat-card h3 {
-        margin: 0 0 10px 0;
-        font-size: 1rem;
-        opacity: 0.9;
-    }
-
-    .stat-card .stat-value {
-        font-size: 2.5rem;
-        font-weight: bold;
-        margin: 0;
-    }
-
-    .availability-toggle {
+    /* Availability Toggle */
+    .availability-card {
+        background: white;
+        padding: 16px 24px;
+       border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         display: flex;
         align-items: center;
-        gap: 15px;
-        background: white;
-        padding: 15px 25px;
-        border-radius: 12px;
-        box-shadow: var(--shadow-sm);
-    }
-
-    .availability-toggle label {
-        font-weight: 600;
-        margin: 0;
+        gap: 16px;
     }
 
     .toggle-switch {
         position: relative;
-        width: 60px;
-        height: 30px;
+        width: 54px;
+        height: 28px;
     }
 
     .toggle-switch input {
@@ -80,179 +51,330 @@
     .slider {
         position: absolute;
         cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        top: 0; left: 0; right: 0; bottom: 0;
         background-color: #ccc;
-        transition: 0.4s;
-        border-radius: 30px;
+        transition: 0.3s;
+        border-radius: 28px;
     }
 
     .slider:before {
         position: absolute;
         content: "";
-        height: 22px;
-        width: 22px;
+        height: 20px;
+        width: 20px;
         left: 4px;
         bottom: 4px;
         background-color: white;
-        transition: 0.4s;
+        transition: 0.3s;
         border-radius: 50%;
     }
 
     input:checked+.slider {
-        background-color: var(--primary);
+        background-color: #48C479;
     }
 
     input:checked+.slider:before {
-        transform: translateX(30px);
+        transform: translateX(26px);
     }
 
-    .orders-section {
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        margin-bottom: 32px;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #FC8019 0%, #ff4757 100%);
+        color: white;
+        padding: 24px;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(252, 128, 25, 0.3);
+    }
+
+    .stat-card h3 {
+        margin: 0 0 8px 0;
+        font-size: 0.9rem;
+        opacity: 0.9;
+        font-weight: 600;
+    }
+
+    .stat-value {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    /* Orders Section */
+    .orders-grid {
+        display: grid;
+        gap: 24px;
+    }
+
+    .section-card {
         background: white;
         border-radius: 16px;
-        padding: 30px;
-        box-shadow: var(--shadow-md);
+        padding: 28px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
     }
 
-    .orders-section h2 {
-        margin-top: 0;
-        color: var(--text-main);
-    }
-
-    .order-card {
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 15px;
-        transition: all 0.3s;
-    }
-
-    .order-card:hover {
-        box-shadow: var(--shadow-md);
-    }
-
-    .order-header {
+    .section-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .section-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin: 0;
+    }
+
+    .view-toggle {
+        display: flex;
+        gap: 8px;
+    }
+
+    .toggle-btn {
+        padding: 8px 16px;
+        border: 2px solid #e0e0e0;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    .toggle-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    /* Order Card */
+    .order-card {
+        border: 2px solid #f0f0f0;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+        transition: all 0.3s;
+        background: white;
+    }
+
+    .order-card:hover {
+        box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        border-color: var(--primary);
+    }
+
+    .order-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
     }
 
     .order-id {
-        font-weight: bold;
+        font-weight: 700;
+        font-size: 1.15rem;
         color: var(--text-main);
-        font-size: 1.1rem;
     }
 
-    .order-status {
-        padding: 6px 12px;
+    .status-badge {
+        padding: 6px 14px;
         border-radius: 20px;
         font-size: 0.85rem;
         font-weight: 600;
     }
 
-    .status-pending {
-        background: #fef3c7;
-        color: #92400e;
+    .status-preparing {
+        background: #FFE5B4;
+        color: #8B4513;
     }
 
     .status-confirmed {
-        background: #dbeafe;
-        color: #1e40af;
-    }
-
-    .status-preparing {
-        background: #e0e7ff;
-        color: #3730a3;
+        background: #DBEAFE;
+        color: #1E40AF;
     }
 
     .status-out-for-delivery {
-        background: #fce7f3;
-        color: #9f1239;
+        background: #FCE7F3;
+        color: #9F1239;
     }
 
-    .status-delivered {
-        background: #d1fae5;
-        color: #065f46;
+    .order-info {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 16px;
     }
 
-    .order-details {
+    .info-item {
+        display: flex;
+        align-items: start;
+        gap: 8px;
+    }
+
+    .info-icon {
+        font-size: 1.1rem;
+        margin-top: 2px;
+    }
+
+    .info-content {
+        flex: 1;
+    }
+
+    .info-label {
+        font-size: 0.85rem;
         color: var(--text-muted);
-        margin-bottom: 15px;
+        margin-bottom: 2px;
     }
 
-    .order-details p {
-        margin: 5px 0;
+    .info-value {
+        font-weight: 600;
+        color: var(--text-main);
+        font-size: 0.95rem;
     }
 
+    /* Location Card */
+    .location-card {
+        background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+        border: 1px solid #BAE6FD;
+        border-radius: 8px;
+        padding: 12px;
+        margin: 12px 0;
+        grid-column: 1 / -1;
+    }
+
+    .location-header {
+        font-weight: 600;
+        color: #0C4A6E;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .location-address {
+        font-size: 0.9rem;
+        color: #075985;
+        line-height: 1.5;
+    }
+
+    /* Action Buttons */
     .order-actions {
         display: flex;
         gap: 10px;
+        flex-wrap: wrap;
     }
 
-    .btn-small {
-        padding: 8px 16px;
-        font-size: 0.9rem;
-        border-radius: 6px;
+    .action-btn {
+        padding: 10px 20px;
         border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
         cursor: pointer;
         transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
 
     .btn-accept {
-        background: #10b981;
+        background: linear-gradient(135deg, #48C479 0%, #36A368 100%);
         color: white;
     }
 
     .btn-accept:hover {
-        background: #059669;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(72, 196, 121, 0.3);
     }
 
-    .btn-reject {
-        background: #ef4444;
+    .btn-received {
+        background: linear-gradient(135deg, #4285F4 0%, #357AE8 100%);
         color: white;
     }
 
-    .btn-reject:hover {
-        background: #dc2626;
+    .btn-received:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
     }
 
-    .btn-update {
+    .btn-delivered {
+        background: linear-gradient(135deg, var(--primary) 0%, #ff4757 100%);
+        color: white;
+    }
+
+    .btn-delivered:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+    }
+
+    .btn-navigate {
+        background: white;
+        border: 2px solid var(--primary);
+        color: var(--primary);
+    }
+
+    .btn-navigate:hover {
         background: var(--primary);
         color: white;
     }
 
-    .btn-update:hover {
-        background: var(--primary-dark);
-    }
-
+    /* Empty State */
     .empty-state {
         text-align: center;
         padding: 60px 20px;
         color: var(--text-muted);
     }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 16px;
+        opacity: 0.6;
+    }
+
+    .empty-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--text-main);
+    }
+
+    @media (max-width: 768px) {
+        .order-info {
+            grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
 </style>
 
 <div class="dashboard-container">
-    <div class="dashboard-header">
-        <h1>🚴 Delivery Agent Dashboard</h1>
-        <div class="availability-toggle">
-            <label>Availability:</label>
+    <!-- Dashboard Header -->
+    <div class="dashboard-top">
+        <h1 class="dashboard-title">🚴 Delivery Dashboard</h1>
+        
+        <div class="availability-card">
+            <span style="font-weight: 600; color: var(--text-main);">Available:</span>
             <label class="toggle-switch">
-                <input type="checkbox" id="availability-toggle" {% if delivery_agent.availability_status %}checked{%
-                    endif %} onchange="toggleAvailability()">
+                <input type="checkbox" id="availability-toggle" {% if delivery_agent.availability_status %}checked{% endif %} onchange="toggleAvailability()">
                 <span class="slider"></span>
             </label>
-            <span id="availability-text"
-                style="font-weight: 600; color: {% if delivery_agent.availability_status %}var(--primary){% else %}#ef4444{% endif %}">
-                {% if delivery_agent.availability_status %}Available{% else %}Not Available{% endif %}
+            <span id="availability-text" style="font-weight: 700; color: {% if delivery_agent.availability_status %}#48C479{% else %}#ef4444{% endif %}">
+                {% if delivery_agent.availability_status %}Online{% else %}Offline{% endif %}
             </span>
         </div>
     </div>
 
-    <!-- Stats Section -->
+    <!-- Statistics -->
     <div class="stats-grid">
         <div class="stat-card">
             <h3>Total Deliveries</h3>
@@ -260,161 +382,551 @@
         </div>
         <div class="stat-card">
             <h3>Total Earnings</h3>
-            <p class="stat-value">₹{{ total_earnings|floatformat:2 }}</p>
+            <p class="stat-value">₹{{ total_earnings|floatformat:0 }}</p>
         </div>
         <div class="stat-card">
-            <h3>Active Orders</h3>
-            <p class="stat-value">{{ active_orders.count }}</p>
-        </div>
-        <div class="stat-card">
-            <h3>Pending Orders</h3>
+            <h3>Pending Pickups</h3>
             <p class="stat-value">{{ pending_orders.count }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Active Deliveries</h3>
+            <p class="stat-value">{{ active_orders.count }}</p>
         </div>
     </div>
 
-    <!-- Assigned Orders Section -->
-    <div class="orders-section">
-        <h2>📦 Assigned Orders</h2>
+    <div class="orders-grid">
+        <!-- Available Orders (Preparing) -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">📋 Available Orders (Preparing)</h2>
+                <span style="color: var(--text-muted); font-size: 0.95rem;">{{ preparing_orders.count }} orders</span>
+            </div>
 
-        {% if assigned_orders %}
-        {% for order in assigned_orders %}
-        <div class="order-card">
-            <div class="order-header">
-                <span class="order-id">Order #{{ order.id }}</span>
-                <span class="order-status status-{{ order.status|slugify }}">{{ order.get_status_display }}</span>
-            </div>
-            <div class="order-details">
-                <p><strong>Customer:</strong> {{ order.user.username }}</p>
-                <p><strong>Restaurant:</strong> {{ order.restaurant.name }}</p>
-                <p><strong>Delivery Address:</strong> {{ order.delivery_address }}</p>
-                <p><strong>Total Amount:</strong> ₹{{ order.grand_total|floatformat:2 }}</p>
-                <p><strong>Delivery Fee:</strong> ₹{{ order.delivery_fee|floatformat:2 }}</p>
-                <p><strong>Ordered:</strong> {{ order.created_at|date:"d M Y, h:i A" }}</p>
-            </div>
-            <div class="order-actions">
-                {% if order.status == 'confirmed' or order.status == 'preparing' %}
-                <button class="btn-small btn-accept" onclick="acceptOrder({{ order.id }})">Accept Order</button>
-                <button class="btn-small btn-reject" onclick="rejectOrder({{ order.id }})">Reject Order</button>
-                {% elif order.status == 'out_for_delivery' %}
-                <button class="btn-small btn-update" onclick="updateStatus({{ order.id }}, 'delivered')">Mark as
-                    Delivered</button>
-                {% elif order.status == 'delivered' %}
-                <span style="color: #10b981; font-weight: 600;">✓ Delivered</span>
-                {% endif %}
-            </div>
+            {% if preparing_orders %}
+                {% for order in preparing_orders %}
+                <div class="order-card preparing" data-order-id="{{ order.id }}" 
+                     data-restaurant-lat="{{ order.restaurant.latitude }}" 
+                     data-restaurant-lon="{{ order.restaurant.longitude }}"
+                     data-restaurant-name="{{ order.restaurant.name }}"
+                     data-restaurant-location="{{ order.restaurant.location }}"
+                     data-delivery-lat="{{ order.delivery_latitude }}"
+                     data-delivery-lon="{{ order.delivery_longitude }}"
+                     data-delivery-address="{{ order.delivery_address }}"
+                     data-customer-phone="{{ order.user.profile.phone }}">
+                    <div class="order-header">
+                        <div>
+                            <div class="order-id">Order #{{ order.id }}</div>
+                            <span class="order-status preparing">🍳 Preparing</span>
+                        </div>
+                    </div>
+
+                    <div class="order-info">
+                        <div class="info-item">
+                            <span class="info-icon">🏪</span>
+                            <div class="info-content">
+                                <div class="info-label">Restaurant</div>
+                                <div class="info-value">{{ order.restaurant.name }}</div>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-icon">👤</span>
+                            <div class="info-content">
+                                <div class="info-label">Customer</div>
+                                <div class="info-value">{{ order.user.username }}</div>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-icon">💰</span>
+                            <div class="info-content">
+                                <div class="info-label">Order Total</div>
+                                <div class="info-value">₹{{ order.grand_total|floatformat:2 }}</div>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-icon">🏍️</span>
+                            <div class="info-content">
+                                <div class="info-label">Delivery Fee</div>
+                                <div class="info-value">₹{{ order.delivery_fee|floatformat:2 }}</div>
+                            </div>
+                        </div>
+
+                        <!-- Restaurant Location -->
+                        <div class="location-card">
+                            <div class="location-header">
+                                📍 Restaurant Location
+                            </div>
+                            <div class="location-address">
+                                {{ order.restaurant.location|default:"Location not available" }}
+                            </div>
+                        </div>
+
+                        <!-- Delivery Address -->
+                        <div class="location-card">
+                            <div class="location-header">
+                                🏠 Delivery Address
+                            </div>
+                            <div class="location-address">
+                                {{ order.delivery_address }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="order-actions">
+                        <button class="action-btn btn-accept" onclick="acceptOrder({{ order.id }})">
+                            ✓ Accept Order
+                        </button>
+                        <button class="action-btn btn-navigate" onclick="navigateToRestaurant({{ order.id }})">
+                            🗺️ Navigate
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">📦</div>
+                    <div class="empty-title">No Preparing Orders</div>
+                    <p>Check back soon for new orders!</p>
+                </div>
+            {% endif %}
         </div>
-        {% endfor %}
-        {% else %}
-        <div class="empty-state">
-            <h2>No Orders Assigned</h2>
-            <p>You don't have any orders assigned yet. Check back later!</p>
+
+        <!-- My Accepted Orders (Pending Pickup) -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">✅ My Accepted Orders</h2>
+                <span style="color: var(--text-muted); font-size: 0.95rem;">{{ pending_orders.count }} pending</span>
+            </div>
+
+            {% if pending_orders %}
+                {% for order in pending_orders %}
+                <div class="order-card pending" data-order-id="{{ order.id }}"
+                     data-restaurant-lat="{{ order.restaurant.latitude }}"
+                     data-restaurant-lon="{{ order.restaurant.longitude }}"
+                     data-restaurant-name="{{ order.restaurant.name }}"
+                     data-restaurant-location="{{ order.restaurant.location }}"
+                     data-delivery-lat="{{ order.delivery_latitude }}"
+                     data-delivery-lon="{{ order.delivery_longitude }}"
+                     data-delivery-address="{{ order.delivery_address }}"
+                     data-customer-phone="{{ order.user.profile.phone }}">
+                    <div class="order-header">
+                        <div>
+                            <div class="order-id">Order #{{ order.id }}</div>
+                            <span class="order-status pending">✓ Accepted</span>
+                        </div>
+                    </div>
+
+                    <div class="order-info">
+                        <div class="info-item">
+                            <span class="info-icon">🏪</span>
+                            <div class="info-content">
+                                <div class="info-label">Restaurant</div>
+                                <div class="info-value">{{ order.restaurant.name }}</div>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-icon">💰</span>
+                            <div class="info-content">
+                                <div class="info-label">Total</div>
+                                <div class="info-value">₹{{ order.grand_total|floatformat:2 }}</div>
+                            </div>
+                        </div>
+
+                        <div class="location-card">
+                            <div class="location-header">📍Restaurant Pickup Location</div>
+                            <div class="location-address">{{ order.restaurant.location }}</div>
+                        </div>
+
+                        <div class="location-card">
+                            <div class="location-header">🏠 Customer Delivery Address</div>
+                            <div class="location-address">{{ order.delivery_address }}</div>
+                        </div>
+                    </div>
+
+                    <div class="order-actions">
+                        <button class="action-btn btn-received" onclick="markAsReceived({{ order.id }})">
+                            📦 Order Received (Start Delivery)
+                        </button>
+                        <button class="action-btn btn-navigate" onclick="navigateToRestaurant({{ order.id }})">
+                            🗺️ Navigate to Restaurant
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">✅</div>
+                    <div class="empty-title">No Pending Pickups</div>
+                    <p>Accept orders from the available list above</p>
+                </div>
+            {% endif %}
         </div>
-        {% endif %}
+
+        <!-- Active Deliveries (Out for Delivery) -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">🚴 Active Deliveries</h2>
+                <span style="color: var(--text-muted); font-size: 0.95rem;">{{ active_orders.count }} active</span>
+            </div>
+
+            {% if active_orders %}
+                {% for order in active_orders %}
+                <div class="order-card active" data-order-id="{{ order.id }}"
+                     data-delivery-lat="{{ order.delivery_latitude }}"
+                     data-delivery-lon="{{ order.delivery_longitude }}"
+                     data-delivery-address="{{ order.delivery_address }}"
+                     data-customer-phone="{{ order.user.profile.phone }}">
+                    <div class="order-header">
+                        <div>
+                            <div class="order-id">Order #{{ order.id }}</div>
+                            <span class="order-status active">🚴 Out for Delivery</span>
+                        </div>
+                    </div>
+
+                    <div class="order-info">
+                        <div class="info-item">
+                            <span class="info-icon">👤</span>
+                            <div class="info-content">
+                                <div class="info-label">Customer</div>
+                                <div class="info-value">{{ order.user.username }}</div>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-icon">📞</span>
+                            <div class="info-content">
+                                <div class="info-label">Phone</div>
+                                <div class="info-value">{{ order.phone|default:"N/A" }}</div>
+                            </div>
+                        </div>
+
+                        <div class="location-card">
+                            <div class="location-header">🏠 Delivery Address</div>
+                            <div class="location-address">{{ order.delivery_address }}</div>
+                        </div>
+                    </div>
+
+                    <div class="order-actions">
+                        <button class="action-btn btn-delivered" onclick="markAsDelivered({{ order.id }})">
+                            ✓ Mark as Delivered
+                        </button>
+                        <button class="action-btn btn-navigate" onclick="navigateToCustomer({{ order.id }})">
+                            🗺️ Navigate to Customer
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">🚴</div>
+                    <div class="empty-title">No Active Deliveries</div>
+                    <p>Pick up accepted orders to start delivering</p>
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>
 
 <script>
-    function toggleAvailability() {
-        fetch("{% url 'delivery:toggle_availability' %}", {
+function toggleAvailability() {
+    fetch("{% url 'delivery:toggle_availability' %}", {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const statusText = document.getElementById('availability-text');
+        statusText.textContent = data.status ? 'Online' : 'Offline';
+        statusText.style.color = data.status ? '#48C479' : '#ef4444';
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function acceptOrder(orderId) {
+    if (confirm('Accept this order? You will need to pick it up from the restaurant.')) {
+        fetch(`/delivery/accept/${orderId}/`, {
             method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-                'Content-Type': 'application/json'
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✓ Order accepted! Head to the restaurant.');
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
             }
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const statusText = document.getElementById('availability-text');
-                    statusText.textContent = data.status ? 'Available' : 'Not Available';
-                    statusText.style.color = data.status ? 'var(--primary)' : '#ef4444';
-                    alert(data.message);
-                } else {
-                    alert('Error: ' + data.error);
+        .catch(error => alert('Failed to accept order'));
+    }
+}
+
+function markAsReceived(orderId) {
+    if (confirm('Mark order as received from restaurant? This will set status to "Out for Delivery".')) {
+        fetch(`/delivery/pickup/${orderId}/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✓ Order picked up! Now delivering to customer.');
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => alert('Failed to mark as received'));
+    }
+}
+
+function markAsDelivered(orderId) {
+    if (confirm('Mark this order as delivered to customer?')) {
+        fetch(`/delivery/deliver/${orderId}/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✓ Delivery completed! Payment earned.');
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => alert('Failed to mark as delivered'));
+    }
+}
+
+// Navigation Functions with Geoapify Routing
+function navigateToRestaurant(orderId) {
+    const orderCard = document.querySelector(`[data-order-id="${orderId}"]`);
+    if (!orderCard) {
+        alert('Order information not found');
+        return;
+    }
+    
+    // Get restaurant coordinates from data attributes
+    const restaurantLat = orderCard.getAttribute('data-restaurant-lat');
+    const restaurantLon = orderCard.getAttribute('data-restaurant-lon');
+    const restaurantName = orderCard.getAttribute('data-restaurant-name');
+    const restaurantLocation = orderCard.getAttribute('data-restaurant-location');
+    
+    if (!restaurantLat || !restaurantLon) {
+        alert(`📍 Restaurant location not available.\n\nAddress: ${restaurantLocation || 'Not specified'}\n\nPlease navigate manually using the address shown.`);
+        return;
+    }
+    
+    // Get current location and navigate
+    navigateToLocation(restaurantLat, restaurantLon, restaurantName, 'restaurant', restaurantLocation);
+}
+
+function navigateToCustomer(orderId) {
+    const orderCard = document.querySelector(`[data-order-id="${orderId}"]`);
+    if (!orderCard) {
+        alert('Order information not found');
+        return;
+    }
+    
+    // Get delivery coordinates from data attributes
+    const deliveryLat = orderCard.getAttribute('data-delivery-lat');
+    const deliveryLon = orderCard.getAttribute('data-delivery-lon');
+    const deliveryAddress = orderCard.getAttribute('data-delivery-address');
+    const customerPhone = orderCard.getAttribute('data-customer-phone');
+    
+    if (!deliveryLat || !deliveryLon) {
+        alert(`📍 Delivery location not available.\n\nAddress: ${deliveryAddress || 'Not specified'}\n${customerPhone ? 'Phone: ' + customerPhone : ''}\n\nPlease navigate manually using the address shown.`);
+        return;
+    }
+    
+    // Get current location and navigate
+    navigateToLocation(deliveryLat, deliveryLon, 'Customer', 'customer', deliveryAddress);
+}
+
+function navigateToLocation(destLat, destLon, destName, type, address) {
+    // First try to get user's current location
+    if (!navigator.geolocation) {
+        // No geolocation - open in Google Maps
+        const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLon}`;
+        window.open(mapsUrl, '_blank');
+        return;
+    }
+    
+    showLoadingMessage('🧭 Getting your location...');
+    
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            hideLoadingMessage();
+            const userLat = position.coords.latitude;
+            const userLon = position.coords.longitude;
+            
+            // Calculate route using Geoapify
+            calculateRoute(userLat, userLon, destLat, destLon, destName, type, address);
+        },
+        (error) => {
+            hideLoadingMessage();
+            console.error('Geolocation error:', error);
+            
+            // Fallback to Google Maps without current location
+            const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLon}`;
+            const confirmed = confirm(`📍 Unable to get your current location.\n\nWould you like to open navigation in Google Maps?\n\nDestination: ${destName}\n${address}`);
+            if (confirmed) {
+                window.open(mapsUrl, '_blank');
+            }
+        },
+        { timeout: 10000, enableHighAccuracy: true }
+    );
+}
+
+function calculateRoute(startLat, startLon, endLat, endLon, destName, type, address) {
+    showLoadingMessage('🗺️ Calculating route...');
+    
+    const apiKey = '{{ GEOAPIFY_API_KEY }}';
+    const url = `https://api.geoapify.com/v1/routing?waypoints=${startLat},${startLon}|${endLat},${endLon}&mode=drive&apiKey=${apiKey}`;
+    
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            hideLoadingMessage();
+            
+            if (data.features && data.features.length > 0) {
+                const route = data.features[0];
+                const properties = route.properties;
+                
+                // Calculate distance and time
+                const distanceKm = (properties.distance / 1000).toFixed(1);
+                const timeMin = Math.round(properties.time / 60);
+                
+                // Show navigation modal
+                showNavigationModal(route, startLat, startLon, endLat, endLon, destName, type, address, distanceKm, timeMin);
+            } else {
+                // Fallback to Google Maps
+                const mapsUrl = `https://www.google.com/maps/dir/${startLat},${startLon}/${endLat},${endLon}`;
+                const confirmed = confirm(`📍 Route calculated!\n\nDestination: ${destName}\n${address}\n\nWould you like to open navigation in Google Maps?`);
+                if (confirmed) {
+                    window.open(mapsUrl, '_blank');
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Failed to update availability status');
-            });
-    }
+            }
+        })
+        .catch(error => {
+            hideLoadingMessage();
+            console.error('Routing error:', error);
+            
+            // Fallback to Google Maps
+            const mapsUrl = `https://www.google.com/maps/dir/${startLat},${startLon}/${endLat},${endLon}`;
+            const confirmed = confirm(`📍 Navigation Ready!\n\nDestination: ${destName}\n${address}\n\nWould you like to open in Google Maps?`);
+            if (confirmed) {
+                window.open(mapsUrl, '_blank');
+            }
+        });
+}
 
-    function acceptOrder(orderId) {
-        if (confirm('Accept this order?')) {
-            fetch(`/delivery/order/${orderId}/accept/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        location.reload();
-                    } else {
-                        alert('Error: ' + data.error);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to accept order');
-                });
-        }
-    }
+function showNavigationModal(route, startLat, startLon, endLat, endLon, destName, type, address, distanceKm, timeMin) {
+    // Create modal HTML
+    const modal = document.createElement('div');
+    modal.id = 'navigation-modal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    `;
+    
+    const icon = type === 'restaurant' ? '🏪' : '🏠';
+    const googleMapsUrl = `https://www.google.com/maps/dir/${startLat},${startLon}/${endLat},${endLon}`;
+    
+    modal.innerHTML = `
+        <div style="background: white; border-radius: 20px; width: 90%; max-width: 600px; max-height: 90vh; overflow: auto; padding: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0; color: #1f2937;">🗺️ Navigation to ${type === 'restaurant' ? 'Restaurant' : 'Customer'}</h2>
+                <button onclick="closeNavigationModal()" style="background: #f3f4f6; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 20px;">✕</button>
+            </div>
+            
+            <div style="background: #f9fafb; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                <h3 style="margin: 0 0 10px 0; color: #374151;">${icon} ${destName}</h3>
+                <p style="margin: 0; color: #6b7280; font-size: 14px;">${address}</p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                <div style="background: #ecfdf5; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold; color: #059669;">${distanceKm} km</div>
+                    <div style="color: #6b7280; font-size: 12px; margin-top: 5px;">Distance</div>
+                </div>
+                <div style="background: #eff6ff; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold; color: #2563eb;">${timeMin} min</div>
+                    <div style="color: #6b7280; font-size: 12px; margin-top: 5px;">ETA</div>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <a href="${googleMapsUrl}" target="_blank" style="display: block; background: linear-gradient(135deg, #4285f4 0%, #34a853 100%); color: white; padding: 16px; border-radius: 12px; text-align: center; text-decoration: none; font-weight: 600; font-size: 16px;">
+                    🧭 Open in Google Maps
+                </a>
+            </div>
+            
+            <div style="text-align: center;">
+                <button onclick="closeNavigationModal()" style="background: #f3f4f6; color: #374151; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                    Close
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
 
-    function rejectOrder(orderId) {
-        if (confirm('Reject this order? It will be unassigned from you.')) {
-            fetch(`/delivery/order/${orderId}/reject/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        location.reload();
-                    } else {
-                        alert('Error: ' + data.error);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to reject order');
-                });
-        }
+function closeNavigationModal() {
+    const modal = document.getElementById('navigation-modal');
+    if (modal) {
+        modal.remove();
     }
+}
 
-    function updateStatus(orderId, status) {
-        if (confirm('Mark this order as delivered?')) {
-            const formData = new FormData();
-            formData.append('status', status);
-
-            fetch(`/delivery/order/${orderId}/update-status/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        location.reload();
-                    } else {
-                        alert('Error: ' + data.error);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to update order status');
-                });
-        }
+function showLoadingMessage(message) {
+    let loader = document.getElementById('loading-overlay');
+    if (!loader) {
+        loader = document.createElement('div');
+        loader.id = 'loading-overlay';
+        loader.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        `;
+        document.body.appendChild(loader);
     }
+    loader.innerHTML = `
+        <div style="background: white; padding: 30px; border-radius: 16px; text-align: center;">
+            <div style="font-size: 40px; margin-bottom: 15px;">⏳</div>
+            <div style="font-size: 18px; color: #374151;">${message}</div>
+        </div>
+    `;
+}
+
+function hideLoadingMessage() {
+    const loader = document.getElementById('loading-overlay');
+    if (loader) {
+        loader.remove();
+    }
+}
 </script>
 {% endblock %}

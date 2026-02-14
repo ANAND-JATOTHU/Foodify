@@ -74,6 +74,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'foodify_project.context_processors.settings_context',
             ],
         },
     },
@@ -169,3 +170,6 @@ PAYMENT_VARIANTS = {
     })
 }
 
+# Geoapify Configuration
+# Get your API key from:  https://www.geoapify.com/
+GEOAPIFY_API_KEY = os.environ.get('GEOAPIFY_API_KEY', '')

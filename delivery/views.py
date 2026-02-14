@@ -23,34 +23,30 @@ def delivery_dashboard(request):
         messages.error(request, 'Delivery agent profile not found.')
         return redirect('index')
     
-    # Filter orders by status for different tabs
-    available_orders = Order.objects.filter(
-        status='confirmed',
-        delivery_agent=None
-    ).order_by('-created_at')[:20]
+    # Get all PREPARING orders that agents can browse and accept
+    preparing_orders = Order.objects.filter(
+        status='preparing'
+    ).select_related('restaurant', 'user').order_by('-created_at')
     
-    # Orders assigned to this agent
-    assigned_orders = Order.objects.filter(delivery_agent=request.user)
+    # Orders assigned to this agent (all statuses)
+    assigned_orders = Order.objects.filter(
+        delivery_agent=request.user
+    ).select_related('restaurant', 'user').order_by('-created_at')
     
     # Orders picked up and out for delivery
     active_orders = assigned_orders.filter(status='out_for_delivery').order_by('-picked_at')
     
-    # Completed deliveries
-    delivered_orders = assigned_orders.filter(status='delivered').order_by('-delivered_at')[:10]
-    
-    # Statistics
-    total_deliveries = delivered_orders.count()
-    pending_pickups = assigned_orders.filter(status__in=['confirmed', 'preparing']).count()
+    # Pending pickups (accepted by agent but not yet picked up)
+    pending_orders = assigned_orders.filter(status__in=['confirmed', 'preparing']).order_by('-created_at')
     
     context = {
         'delivery_agent': delivery_agent,
-        'available_orders': available_orders,
-        'pending_pickups': assigned_orders.filter(status__in=['confirmed', 'preparing']),
+        'preparing_orders': preparing_orders,  # All preparing orders for browsing
+        'assigned_orders': assigned_orders,  # Orders assigned to this agent
+        'pending_orders': pending_orders,  # Orders agent accepted but hasn't picked up
         'active_orders': active_orders,
-        'delivered_orders': delivered_orders,
         'total_deliveries': delivery_agent.total_deliveries,
         'total_earnings': delivery_agent.total_earnings,
-        'pending_pickups_count': pending_pickups,
     }
     
     return render(request, 'delivery/delivery_dashboard.html', context)
@@ -139,12 +135,6 @@ def mark_as_delivered(request, order_id):
     order.status = 'delivered'
     order.delivered_at = timezone.now()
     order.save()
-    
-    # Update agent statistics
-    agent = request.user.delivery_profile
-    agent.total_deliveries += 1
-    agent.total_earnings += order.delivery_fee
-    agent.save()
     
     messages.success(request, f'Order #{order.id} delivered successfully! Great job!')
     return JsonResponse({

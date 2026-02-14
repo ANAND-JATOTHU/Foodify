@@ -4,6 +4,161 @@
 {% block title %}My Order - Foodify{% endblock %}
 
 {% block content %}
+<!-- Load Geoapify JS before using it -->
+<script src="{% static 'js/geoapify.js' %}"></script>
+
+<style>
+    /* Location button styling */
+    .location-btn-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    .gps-location-btn, .map-location-btn {
+        flex: 1;
+        padding: 10px 16px;
+        background: linear-gradient(135deg, #48C479 0%, #36a368 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    .map-location-btn {
+        background: linear-gradient(135deg, #4285F4 0%, #357AE8 100%);
+    }
+    .gps-location-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(72, 196, 121, 0.3);
+    }
+    .map-location-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+    }
+    .gps-location-btn:disabled, .map-location-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+    .address-input-wrapper {
+        position: relative;
+    }
+    .location-indicator {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #48C479;
+        font-size: 1.2rem;
+    }
+    
+    /* Map modal */
+    .map-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 10000;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s;
+    }
+    .map-modal.active {
+        display: flex;
+    }
+    .map-modal-content {
+        background: white;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 800px;
+        max-height: 90vh;
+        overflow: hidden;
+        animation: slideUp 0.3s;
+    }
+    .map-modal-header {
+        padding: 20px 24px;
+        background: linear-gradient(135deg, var(--primary) 0%, #ff4757 100%);
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .map-modal-header h3 {
+        margin: 0;
+        font-size: 1.3rem;
+    }
+    .map-modal-close {
+        background: rgba(255,255,255,0.2);
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+    .map-modal-close:hover {
+        background: rgba(255,255,255,0.3);
+        transform: rotate(90deg);
+    }
+    .map-container {
+        height: 500px;
+        position: relative;
+    }
+    #locationMap {
+        width: 100%;
+        height: 100%;
+    }
+    .map-modal-footer {
+        padding: 16px 24px;
+        background: #f9f9f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .confirm-location-btn {
+        padding: 12px 30px;
+        background: linear-gradient(135deg, var(--primary) 0%, #ff4757 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .confirm-location-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    @keyframes slideUp {
+        from { transform: translateY(50px); opacity:0; }
+        to { transform: translateY(0); opacity:1; }
+    }
+    
+    /* Hidden coordinate fields */
+    .hidden-coords {
+        display: none;
+    }
+</style>
+
 <style>
     .my-order-page {
         max-width: 1400px;
@@ -458,11 +613,30 @@
                         <span>₹{{ total }}</span>
                     </div>
                     
-                    <form method="post" action="{% url 'orders:place_order' %}" class="checkout-form">
+                    <form method="post" action="{% url 'orders:place_order' %}" class="checkout-form" id="checkout-form">
                         {% csrf_token %}
                         <div class="form-field">
                             <label class="form-label">📍 Delivery Address</label>
-                            <textarea name="delivery_address" rows="2" required class="form-input">{{ user.profile.address }}</textarea>
+                            
+                            <!-- GPS and Map Location Buttons -->
+                            <div class="location-btn-group">
+                                <button type="button" class="gps-location-btn" id="gps-location-btn">
+                                    📍 Use GPS Location
+                                </button>
+                                <button type="button" class="map-location-btn" id="map-location-btn">
+                                    🗺️ Pick on Map
+                                </button>
+                            </div>
+                            
+                            <!-- Address input with autocomplete -->
+                            <div class="address-input-wrapper">
+                                <textarea name="delivery_address" id="delivery-address" rows="2" required class="form-input">{{ user.profile.address }}</textarea>
+                                <span class="location-indicator" id="location-indicator" style="display: none;">✓</span>
+                            </div>
+                            
+                            <!-- Hidden coordinate fields -->
+                            <input type="hidden" name="delivery_latitude" id="delivery-latitude">
+                            <input type="hidden" name="delivery_longitude" id="delivery-longitude">
                         </div>
                         <div class="form-field">
                             <label class="form-label">📱 Phone Number</label>
@@ -484,4 +658,183 @@
         </div>
     </div>
 </div>
+
+<!-- Map Modal -->
+<div class="map-modal" id="map-modal">
+    <div class="map-modal-content">
+        <div class="map-modal-header">
+            <h3>📍 Select Delivery Location</h3>
+            <button class="map-modal-close" id="map-modal-close">×</button>
+        </div>
+        <div class="map-container">
+            <div id="locationMap"></div>
+        </div>
+        <div class="map-modal-footer">
+            <div style="flex: 1; font-size: 0.9rem; color: #686b78;">
+                <span id="selected-address">Drag marker to select location</span>
+            </div>
+            <button class="confirm-location-btn" id="confirm-location-btn">Confirm Location</button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const apiKey = '{{ GEOAPIFY_API_KEY }}';
+    
+    console.log('Cart page loaded');
+    console.log('API Key:', apiKey ? 'Present' : 'Missing');
+    console.log('initGeoapify function:', typeof initGeoapify);
+    
+    if (!apiKey) {
+        console.error('Geoapify API key not found');
+        alert('⚠️ Location features unavailable: API key not configured');
+        return;
+    }
+    
+    // Check if geoapify.js is loaded
+    if (typeof initGeoapify === 'undefined') {
+        console.error('Geoapify utilities not loaded');
+        alert('⚠️ Location features unavailable: Scripts not loaded properly');
+        return;
+    }
+    
+    // Initialize Geoapify
+    const geo = initGeoapify(apiKey);
+    
+    const addressInput = document.getElementById('delivery-address');
+    const latInput = document.getElementById('delivery-latitude');
+    const lonInput = document.getElementById('delivery-longitude');
+    const locationIndicator = document.getElementById('location-indicator');
+    const gpsBtn = document.getElementById('gps-location-btn');
+    const mapBtn = document.getElementById('map-location-btn');
+    const mapModal = document.getElementById('map-modal');
+    const modalClose = document.getElementById('map-modal-close');
+    const confirmLocationBtn = document.getElementById('confirm-location-btn');
+    const selectedAddressSpan = document.getElementById('selected-address');
+    
+    let selectedLocation = null;
+    let map, marker;
+    
+    // Initialize autocomplete on address input
+    geo.initAutocomplete(addressInput, function(addressData) {
+        latInput.value = addressData.lat;
+        lonInput.value = addressData.lon;
+        locationIndicator.style.display = 'block';
+        selectedLocation = addressData;
+    });
+    
+    // GPS Location Button
+    gpsBtn.addEventListener('click', async function() {
+        gpsBtn.disabled = true;
+        gpsBtn.textContent = '🔄 Getting location...';
+        
+        try {
+            const coords = await geo.getCurrentLocation();
+            const address = await geo.reverseGeocode(coords.lat, coords.lon);
+            
+            addressInput.value = address.formatted;
+            latInput.value = coords.lat;
+            lonInput.value = coords.lon;
+            locationIndicator.style.display = 'block';
+            selectedLocation = address;
+            
+            gpsBtn.textContent = '✓ Location Detected';
+            setTimeout(() => {
+                gpsBtn.textContent = '📍 Use GPS Location';
+                gpsBtn.disabled = false;
+            }, 2000);
+        } catch (error) {
+            alert(error.message);
+            gpsBtn.textContent = '📍 Use GPS Location';
+            gpsBtn.disabled = false;
+        }
+    });
+    
+    // Map Location Button
+    mapBtn.addEventListener('click', async function() {
+        mapModal.classList.add('active');
+        
+        // Initialize map if not already done
+        if (!map) {
+            initMap();
+        }
+    });
+    
+    // Close modal
+    modalClose.addEventListener('click', function() {
+        mapModal.classList.remove('active');
+    });
+    
+    // Confirm location from map
+    confirmLocationBtn.addEventListener('click', async function() {
+        if (selectedLocation) {
+            addressInput.value = selectedLocation.formatted;
+            latInput.value = selectedLocation.lat;
+            lonInput.value = selectedLocation.lon;
+            locationIndicator.style.display = 'block';
+            mapModal.classList.remove('active');
+        }
+    });
+    
+    // Initialize Leaflet map
+    async function initMap() {
+        // Get current location or default to a city center
+        let initialLat = 28.6139; // Default: Delhi
+        let initialLon = 77.2090;
+        
+        try {
+            const coords = await geo.getCurrentLocation();
+            initialLat = coords.lat;
+            initialLon = coords.lon;
+        } catch (e) {
+            console.log('Using default location');
+        }
+        
+        // Create Leaflet map with Geoapify tiles
+        map = L.map('locationMap').setView([initialLat, initialLon], 13);
+        
+        L.tileLayer(`https://maps.geoapify.com/v1/tile/osm-bright/{z}/{x}/{y}.png?apiKey=${apiKey}`, {
+            attribution: 'Powered by <a href="https://www.geoapify.com/" target="_blank">Geoapify</a> | © OpenStreetMap contributors',
+            maxZoom: 20
+        }).addTo(map);
+        
+        // Add draggable marker
+        marker = L.marker([initialLat, initialLon], {
+            draggable: true,
+            icon: L.icon({
+                iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41]
+            })
+        }).addTo(map);
+        
+        // Update address when marker is dragged
+        marker.on('dragend', async function(e) {
+            const pos = marker.getLatPosition();
+            try {
+                const address = await geo.reverseGeocode(pos.lat, pos.lng);
+                selectedLocation = address;
+                selectedAddressSpan.textContent = address.formatted;
+            } catch (error) {
+                console.error('Reverse geocoding failed:', error);
+            }
+        });
+        
+        // Get initial address
+        try {
+            const address = await geo.reverseGeocode(initialLat, initialLon);
+            selectedLocation = address;
+            selectedAddressSpan.textContent = address.formatted;
+        } catch (error) {
+            console.error('Initial geocoding failed:', error);
+        }
+    }
+});
+</script>
+
+<!-- Leaflet CSS and JS for map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 {% endblock %}
