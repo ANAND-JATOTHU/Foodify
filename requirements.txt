@@ -1,5 +1,14 @@
+# Production Dependencies
 Django>=5.2.11
 Pillow>=10.0.0
 python-dotenv>=1.0.0
 django-payments>=2.0.0
 stripe>=5.0.0
+
+# Database
+dj-database-url>=2.1.0
+psycopg2-binary>=2.9.9
+
+# Production Server
+gunicorn>=21.2.0
+whitenoise>=6.6.0
