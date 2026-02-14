@@ -1,196 +1,168 @@
 # 🍕 Foodify - Complete Food Delivery Platform
 
-## Project Title
-**Foodify: Multi-Role Food Delivery & Management System**
+[![Django](https://img.shields.io/badge/Django-5.2.11-green.svg)](https://www.djangoproject.com/)
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+**Foodify** is a comprehensive, full-stack food delivery and donation platform built with Django. It features multi-role authentication, real-time order tracking, Stripe payments, GPS navigation, and an innovative food donation system to reduce waste.
 
 ---
 
-## Abstract
+## 📋 Table of Contents
 
-Foodify is a comprehensive, full-stack web-based food delivery and restaurant management platform built with Django and Python. The system provides a seamless experience for three distinct user roles: **Customers**, **Restaurant Owners**, and **Delivery Agents**. It features an intuitive user interface with real-time order tracking, integrated payment processing, food donation management, and delivery logistics.
-
-The platform addresses the complete food delivery ecosystem by providing customers with easy restaurant browsing and ordering capabilities, restaurant owners with comprehensive management dashboards, and delivery agents with optimized delivery tracking tools. Additionally, Foodify incorporates a unique food donation feature to reduce food waste and support community welfare.
-
-Key technologies include Django framework, SQLite database, Stripe payment integration, responsive HTML/CSS/JavaScript frontend, and AOS (Animate On Scroll) library for smooth animations.
+- [Features](#-features--functionalities)
+- [Technology Stack](#-technology-stack)
+- [Installation](#-installation--setup)
+- [Usage Guide](#-usage-guide)
+- [Project Structure](#-project-structure)
+- [Database Schema](#-database-schema)
+- [API Integration](#-api-integration)
+- [Security](#-security-features)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ---
 
 ## 🌟 Features & Functionalities
 
 ### 1. **Multi-Role Authentication System**
-- **Three User Types**:
-  - 🛍️ **Customer**: Browse restaurants, order food, track deliveries
-  - 🏪 **Restaurant Owner**: Manage restaurants, menus, and orders
-  - 🚴 **Delivery Agent**: Accept and deliver orders, manage availability
-- **Secure Authentication**: Login/logout with session management
-- **Dynamic Registration Form**: Conditional fields based on selected user type
-- **Premium Animated Login UI**: 
-  - Food-themed glassmorphism design
-  - Floating food emoji animations
-  - Password visibility toggle
-  - Ripple effects on buttons
-  - Responsive and accessible
 
-### 2. **Customer Features**
-- **Restaurant Browsing**:
-  - Search by restaurant name or cuisine type
-  - Filter by rating, distance, and dietary preferences (veg/non-veg)
-  - View restaurant details and complete menus
-  - Add restaurants to favorites
-- **Shopping Cart Management**:
-  - Add/remove/update menu items
-  - Real-time price calculation with delivery fees and taxes
-  - Cart badge showing item count
-- **Order Placement**: 
-  - Secure checkout process
-  - Order history and tracking
-  - Payment integration for online transactions
-- **Home Page**:
-  - Hero section with call-to-action
-  - Cuisine carousel (Pizza, Burger, Biryani, etc.)
-  - Featured food cards with smooth animations
+- **🛍 Customer**: Browse, order, track deliveries
+- **🏪 Restaurant Owner**: Manage restaurants, menus, orders
+- **🚴 Delivery Agent**: Accept/deliver orders, track earnings
+- Premium animated login UI with glassmorphism
+- Session-based authentication with role-based dashboards
 
-### 3. **Restaurant Owner Features**
-- **Owner Dashboard**:
-  - View all owned restaurants
-  - Quick access to restaurant management
-  - Order notifications and management
+### 2. **Enhanced Food Donation System** 🆕
+
+**Revolutionary Features:**
+- **Quantity-Based Booking**: Users book specific serving amounts (e.g., 5 out of 25 servings)
+- **Time-Based Expiry**: Auto-hide expired donations with urgency levels
+  - 🔥 Critical (< 2hrs) - Pulsing red badge
+  - ⚠️ High (2-6hrs) - Orange badge
+  - ⏰ Medium (6-12hrs) - Yellow badge
+  - ✅ Low (> 12hrs) - Green badge
+- **GPS Navigation**: Navigate to pickup locations from My Bookings
+- **Donor-Booker Communication**: Phone numbers shared after booking
+- **Real-Time Updates**: Auto-refresh every 2 minutes
+- **Professional UI**: Modern cards, filters, quantity visualizations
+
+**Donation Workflow:**
+1. Donor creates listing (food name, quantity, expiry time, location)
+2. Users browse with filters (food type, category, urgency)
+3. Book desired quantity with contact details
+4. GPS navigation to pickup location
+5. Donor marks as collected
+
+### 3. **Customer Features**
+
+- **Restaurant Discovery**:
+  - Search by name/cuisine
+  - Advanced filters (rating, distance, dietary preferences)
+  - Cuisine carousel (Pizza, Burger, Biryani, Chinese, etc.)
+- **Smart Cart**:
+  - Real-time price calculation
+  - Delivery fees (₹40) + 5% GST
+  - Cart persistence
+- **Order Tracking**:
+  - Status updates (Pending → Confirmed → Preparing → Out for Delivery → Delivered)
+  - Order history
+  - Reorder functionality
+
+### 4. **Restaurant Owner Dashboard**
+
 - **Restaurant Management**:
-  - Add new restaurants with details (cuisine, location, description)
-  - Edit restaurant information and images
-  - Approval system for restaurant listings
+  - Add/edit restaurants with images
+  - Approval workflow
+  - Location-based listing
 - **Menu Management**:
-  - Add, edit, and delete menu items
-  - Set item availability status
-  - Upload food images
-  - Categorize menu items (veg/non-veg)
-- **Order Management**:
-  - View incoming orders  
-  - Update order status (confirmed, preparing, ready)
-  - Track order history and revenue
+  - CRUD operations on menu items
+  - Veg/Non-veg tagging
+  - Availability toggles
+- **Order Processing**:
+  - Real-time notifications
+  - Status updates
+  - Revenue tracking
 
-### 4. **Delivery Agent Features**
-- **Delivery Dashboard**:
-  - View assigned orders
-  - Filter by status (pending, active, delivered)
-  - Track earnings and total deliveries
-- **Order Management**:
-  - Accept or reject order assignments
-  - Update order status (out for delivery, delivered)
-  - Real-time delivery tracking
-- **Agent Profile**:
-  - Vehicle details (type, number, license)
-  - Availability status toggle
-  - ID proof verification system
+### 5. **Delivery Agent Features**
 
-### 5. **Food Donation System**
-- **Donate Surplus Food**:
-  - Create donation listings with food details
-  - Specify quantity, category (cooked/raw/packaged)
-  - Set expiry times to ensure food safety
-  - Upload proof images
-- **Browse Donations**:
-  - Search available food donations
-  - Filter by category and food type
-  - Reserve donations for pickup
-  - Notification system for donors and receivers
-- **Donation Management**:
-  - Track donation status (available, reserved, collected)
-  - Admin approval and verification
-  - Reduce food waste and support community
+- **Smart Dashboard**:
+  - Assigned orders view
+  - Earnings tracker
+  - Delivery statistics
+- **Order Management**:
+  - Accept/reject assignments
+  - Update delivery status
+  - Performance metrics
+- **Profile Management**:
+  - Vehicle details
+  - Availability toggle
+  - License verification
 
 ### 6. **Payment System**
+
 - **Stripe Integration**:
-  - Secure online payment processing
-  - Support for credit/debit cards
+  - Secure card payments
   - Payment status tracking
+  - Transaction history
 - **Django-Payments Framework**:
-  - Multiple payment provider support
-  - Payment transaction history
-  - Automated payment notifications
-- **Transaction Management**:
-  - Detailed payment records
+  - Multiple provider support
   - Refund processing
-  - Restaurant-wise revenue tracking
+  - Automated notifications
 
-### 7. **Search & Filtering**
-- **Advanced Search**:
-  - Search restaurants by name or cuisine
-  - Multi-criteria filtering:
-    - Cuisine type (Italian, Indian, Chinese, etc.)
-    - Dietary preferences (Vegetarian/Non-Vegetarian)
-    - Distance from user location
-    - Restaurant ratings (4+ stars, 3+ stars)
-  - Real-time search results
-- **Smart Filtering**: Combine multiple filters for precise results
+### 7. **Location Services** 🆕
 
-### 8. **Admin Panel**
-- **Comprehensive Management**:
-  - User management (customers, owners, agents)
-  - Restaurant approval workflow
-  - Order monitoring and analytics
-  - Payment transaction oversight
-  - Donation moderation
-- **Model Administration**:
-  - UserProfile (with user role tracking)
-  - DeliveryAgent (vehicle and license details)
-  - Restaurant and MenuItem
-  - Orders and OrderItems
-  - Payments and PaymentTransactions
-  - Donations and DonationProofs
-  - Notifications
+- **Geoapify Integration**:
+  - GPS geolocation
+  - Address autocomplete
+  - Map picker for manual selection
+  - Reverse geocoding
+- **Navigation Features**:
+  - Google Maps integration
+  - Route calculation
+  - Distance tracking
+- **Implementation**:
+  - Cart page: GPS/map picker for delivery address
+  - Donations: Navigate to pickup locations
+  - Restaurants: Location-based filtering
 
-### 9. **UI/UX Enhancements**
-- **Responsive Design**: Mobile-first approach, works on all devices
+### 8. **Modern UI/UX**
+
+- **Responsive Design**: Mobile-first, all devices
 - **Smooth Animations**:
-  - AOS (Animate On Scroll) library integration
-  - Slide-in, fade-in, zoom effects
-  - Hover animations and transitions
-- **Modern Design Elements**:
-  - Glassmorphism effects
+  - AOS (Animate On Scroll) library
+  - Hover effects and transitions
+  - Loading states
+- **Design Elements**:
+  - Glassmorphism
   - Gradient backgrounds
   - Card-based layouts
-  - Icon-based navigation
-- **Visual Feedback**:
-  - Toast notifications for actions
-  - Loading states
-  - Success/error messages
-
-### 10. **Additional Features**
-- **Contact System**: Contact form for user inquiries
-- **Profile Management**: Update user information and profile pictures
-- **Session Management**: Secure login sessions with timeout
-- **Media Uploads**: Support for restaurant and food images
-- **Email Notifications**: Order confirmations and updates
-- **RESTful URL Structure**: Clean and semantic URLs
-- **CSRF Protection**: Security against cross-site attacks
+  - Premium color schemes
 
 ---
 
 ## 🛠️ Technology Stack
 
 ### Backend
-- **Framework**: Django 5.2.11
-- **Language**: Python 3.x
-- **Database**: SQLite (Development) / PostgreSQL (Production-ready)
-- **ORM**: Django ORM
-- **Authentication**: Django Built-in Auth System
+- **Django 5.2.11** - Web framework
+- **Python 3.8+** - Programming language
+- **SQLite** - Database (production-ready for PostgreSQL/MySQL)
 
 ### Frontend
-- **HTML5**: Semantic markup
-- **CSS3**: Modern styling with custom properties
-- **JavaScript (Vanilla)**: Interactive features
-- **AOS Library**: Scroll animations
-- **Responsive Design**: Mobile-first approach
+- **HTML5** - Semantic markup
+- **CSS3** - Modern styling (Grid, Flexbox, Variables)
+- **JavaScript** - Vanilla + ES6
+- **AOS Library** - Scroll animations
 
-### Payment Integration
-- **Stripe API**: Payment processing
-- **Django-Payments**: Payment framework
+### APIs & Integrations
+- **Stripe API** - Payment processing
+- **Geoapify API** - Maps, geocoding, navigation
+- **Google Maps** - Navigation routes
 
-### Additional Tools
-- **Python Dotenv**: Environment variable management
-- **Pillow**: Image processing
-- **Django Messages Framework**: User notifications
+### Additional
+- **Python Dotenv** - Environment management
+- **Pillow** - Image processing
+- **Django Messages** - Notifications
 
 ---
 
@@ -198,39 +170,40 @@ Key technologies include Django framework, SQLite database, Stripe payment integ
 
 ### Core Models
 
-1. **User (Django Built-in)** - Base authentication
-2. **UserProfile** - Extended user information
-   - user_type: customer | restaurant_owner | delivery_agent
-   - phone, profile_picture, address
-3. **DeliveryAgent** - Delivery agent details
-   - vehicle_type, vehicle_number, driving_license
-   - availability_status, total_deliveries, earnings
-4. **Restaurant** - Restaurant information
-   - owner, name, cuisine, rating, location, distance
-   - is_veg, is_approved
-5. **MenuItem** - Restaurant menu items
-   - restaurant, name, price, description, image
-   - is_available, is_veg
-6. **Cart** - Shopping cart items
-   - user, menu_item, quantity
-7. **Order** - Customer orders
-   - user, restaurant, delivery_agent
-   - total_amount, delivery_fee, tax_amount
-   - status, delivery_address, payment details
-8. **OrderItem** - Individual items in order
-   - order, menu_item, name, price, quantity
-9. **Payment** - Payment transactions
-   - order, variant, status, amount
-10. **PaymentTransaction** - Detailed payment records
-   - order, restaurant, customer, transaction_id
-   - payment_method, status, gateway_response
-11. **Donation** - Food donations
-   - donor, restaurant, food_name, quantity, category
-   - status, expiry_time, reserved_by
-12. **DonationProof** - Donation verification
-   - donation, image, notes
-13. **Notification** - User notifications
-   - user, message, is_read, donation
+```python
+# User Management
+- User (Django built-in)
+- UserProfile (customer/owner/agent + phone, address, picture)
+- DeliveryAgent (vehicle details, license, availability, earnings)
+
+# Restaurant System
+- Restaurant (owner, name, cuisine, rating, location, approved status)
+- MenuItem (restaurant, name, price, description, image, veg/non-veg)
+- Favorite (user favorites)
+
+# Order System
+- Cart (user, menu_item, quantity)
+- Order (user, restaurant, agent, amounts, status, delivery info)
+- OrderItem (order, menu_item, quantity, price snapshot)
+
+# Payment System
+- Payment (order, variant, status, amount)
+- PaymentTransaction (transaction_id, method, gateway response)
+
+# Donation System (Enhanced) 🆕
+- Donation (donor, food_name, original_quantity, available_quantity,
+           quantity_unit, expiry_time, location, lat/lon, contact)
+- DonationBooking (donation, booked_by, quantity_booked, booker_name,
+                   booker_phone, status, preferred_collection_time)
+- DonationProof (donation, image, notes, verified)
+- Notification (user, donation, message, is_read)
+```
+
+### Key Relationships
+- One User → Many Orders/Donations/Bookings
+- One Restaurant → Many MenuItems/Orders
+- One Order → Many OrderItems
+- One Donation → Many DonationBookings
 
 ---
 
@@ -238,51 +211,55 @@ Key technologies include Django framework, SQLite database, Stripe payment integ
 
 ```
 Foodify/
-├── accounts/               # User authentication & profiles
-│   ├── models.py          # UserProfile, DeliveryAgent models
-│   ├── views.py           # Login, register, logout views
-│   ├── forms.py           # Registration forms
+├── accounts/              # Authentication & profiles
+│   ├── models.py         # UserProfile, DeliveryAgent
+│   ├── views.py          # Login, register, logout
 │   └── templates/
-│       └── accounts/
-│           └── login_signup.html  # Premium animated login UI
+│       └── login_signup.html  # Premium animated login
 ├── restaurants/           # Restaurant management
-│   ├── models.py          # Restaurant, MenuItem, Favorite
-│   ├── views.py           # Restaurant list, search, CRUD
+│   ├── models.py         # Restaurant, MenuItem, Favorite
+│   ├── views.py          # CRUD, search, filtering
 │   └── templates/
-├── orders/                # Order management
-│   ├── models.py          # Cart, Order, OrderItem, Payment
-│   ├── views.py           # Cart, checkout, order tracking
+├── orders/                # Order & cart management
+│   ├── models.py         # Cart, Order, OrderItem
+│   ├── views.py          # Cart, checkout, tracking
 │   └── templates/
+│       └── cart.html     # GPS/map picker integration
 ├── payment_system/        # Payment processing
-│   ├── models.py          # PaymentTransaction, Notifications
-│   ├── views.py           # Payment processing views
+│   ├── models.py         # PaymentTransaction
+│   ├── views.py          # Stripe integration
 │   └── templates/
-├── donations/             # Food donation system
-│   ├── models.py          # Donation, DonationProof, Notification
-│   ├── views.py           # Donation CRUD, filter, reserve
+├── donations/             # Food donation system 🆕
+│   ├── models.py         # Donation, DonationBooking, Proof
+│   ├── views.py          # Quantity booking, expiry filtering
+│   ├── forms.py          # DonationForm, BookingForm
 │   └── templates/
+│       ├── donation_list.html      # Modern cards with urgency
+│       ├── book_donation.html      # Quantity selector
+│       └── my_bookings.html        # GPS navigation
 ├── delivery/              # Delivery agent features
-│   ├── views.py           # Dashboard, order management
 │   └── templates/
-├── templates/             # Global templates
-│   ├── base.html          # Base template with navbar
-│   ├── index.html         # Homepage with hero & carousel
-│   ├── contact.html       # Contact page
-│   └── cart.html          # Shopping cart
 ├── static/                # Static assets
-│   ├── css/               # Stylesheets
-│   ├── js/                # JavaScript files
-│   └── assets/            # Images and media
+│   ├── css/              # Stylesheets
+│   ├── js/
+│   │   └── geoapify.js   # Geoapify utilities
+│   └── assets/           # Images
+├── templates/             # Global templates
+│   ├── base.html         # Base with navbar
+│   ├── index.html        # Homepage with carousel
+│   └── contact.html
 ├── media/                 # User uploads
-├── foodify_project/       # Project configuration
-│   ├── settings.py        # Django settings
-│   ├── urls.py            # URL routing
-│   └── views.py           # Core views (index, contact)
-├── manage.py              # Django management script
-├── requirements.txt       # Python dependencies
+├── foodify_project/       # Configuration
+│   ├── settings.py       # Django settings
+│   ├── urls.py           # URL routing
+│   └── context_processors.py  # Geoapify API key
+├── manage.py
+├── requirements.txt
 ├── .env                   # Environment variables
-├── README.md              # Project documentation (this file)
-└── db.sqlite3             # SQLite database
+├── .env.example          # Template
+├── populate_donations.py  # 10 dummy donations script
+├── README.md             # This file
+└── db.sqlite3
 ```
 
 ---
@@ -290,15 +267,15 @@ Foodify/
 ## 🚀 Installation & Setup
 
 ### Prerequisites
-- Python 3.8 or higher
-- pip (Python package manager)
-- Virtual environment (venv)
+- Python 3.8+
+- pip package manager
+- Virtual environment
 
 ### Step-by-Step Installation
 
 1. **Clone the Repository**
    ```bash
-   git clone <your-repository-url>
+   git clone https://github.com/ANAND-JATOTHU/Foodify.git
    cd Foodify
    ```
 
@@ -308,11 +285,11 @@ Foodify/
    ```
 
 3. **Activate Virtual Environment**
-   - **Windows** (PowerShell):
+   - Windows (PowerShell):
      ```powershell
      .\venv\Scripts\Activate.ps1
      ```
-   - **macOS/Linux**:
+   - macOS/Linux:
      ```bash
      source venv/bin/activate
      ```
@@ -323,41 +300,47 @@ Foodify/
    ```
 
 5. **Configure Environment Variables**
-   - Copy `.env.example` to `.env`
-   - Update Stripe API keys:
-     ```
-     STRIPE_PUBLIC_KEY=your_public_key_here
-     STRIPE_SECRET_KEY=your_secret_key_here
-     ```
+   ```bash
+   # Copy .env.example to .env
+   cp .env.example .env
+   
+   # Edit .env with your keys:
+   STRIPE_PUBLIC_KEY=your_stripe_public_key
+   STRIPE_SECRET_KEY=your_stripe_secret_key
+   GEOAPIFY_API_KEY=your_geoapify_api_key
+   ```
 
 6. **Run Migrations**
    ```bash
-   python manage.py makemigrations
    python manage.py migrate
    ```
 
-7. **Create Superuser (Admin Account)**
+7. **Create Superuser**
    ```bash
    python manage.py createsuperuser
    ```
 
-8. **Create Test Users** (Optional)
+8. **Create Test Data** (Optional)
    ```bash
-   python create_dummy_users.py
+   # Create test users (customer, owner, agent)
+   python create_test_accounts.py
+   
+   # Populate 10 dummy donations
+   python populate_donations.py
+   
+   # Add sample restaurants
+   python add_sample_restaurants.py
    ```
-   This creates three test accounts:
-   - **Customer**: username: `customer_user`, password: `customer123`
-   - **Owner**: username: `owner_user`, password: `owner123`
-   - **Agent**: username: `agent_user`, password: `agent123`
 
 9. **Run Development Server**
    ```bash
    python manage.py runserver
    ```
 
-10. **Access the Application**
+10. **Access Application**
     - Homepage: http://localhost:8000/
-    - Admin Panel: http://localhost:8000/admin/
+    - Admin: http://localhost:8000/admin/
+    - Donations: http://localhost:8000/donations/
     - Login: http://localhost:8000/accounts/login/
 
 ---
@@ -365,46 +348,118 @@ Foodify/
 ## 📱 Usage Guide
 
 ### For Customers
-1. **Register/Login** at `/accounts/login/`
-2. **Browse Restaurants** at `/restaurants/`
-3. **Search & Filter**: Use search bar and filters
-4. **Add to Cart**: Click menu items from restaurant details
-5. **Checkout**: Review cart and complete payment
-6. **Track Orders**: View order status and history
+
+1. **Register/Login** → `/accounts/login/`
+2. **Browse Restaurants** → `/restaurants/`
+3. **Search & Filter** → Use cuisine, veg/non-veg, rating filters
+4. **Add to Cart** → Click items from restaurant details
+5. **Use GPS** → Cart page has "Use GPS Location" button
+6. **Checkout** → Review cart, enter delivery address
+7. **Track Orders** → View status updates
+8. **Browse Donations** → `/donations/` for free food
+9. **Book Donation** → Select quantity, view GPS navigation
 
 ### For Restaurant Owners
-1. **Register as Owner** with user_type "Restaurant Owner"
-2. **Access Dashboard** at `/restaurants/dashboard/`
-3. **Add Restaurant**: Fill in details and upload images
-4. **Manage Menu**: Add/edit/delete menu items
-5. **Process Orders**: View and update incoming orders
+
+1. **Register as Owner** → Select "Restaurant Owner" type
+2. **Dashboard** → `/restaurants/dashboard/`
+3. **Add Restaurant** → Fill details, upload images
+4. **Manage Menu** → Add/edit items with prices
+5. **Process Orders** → Update status (confirmed → preparing → ready)
+6. **Donate Food** → Create donation listings for surplus
 
 ### For Delivery Agents
-1. **Register as Agent** with vehicle details
-2. **Access Dashboard** at `/delivery/dashboard/`
-3. **Accept Orders**: View and accept assigned deliveries
-4. **Update Status**: Mark orders as "Out for Delivery" or "Delivered"
-5. **Toggle Availability**: Control when you receive orders
+
+1. **Register as Agent** → Provide vehicle/license details
+2. **Dashboard** → `/delivery/dashboard/`
+3. **Accept Orders** → View assigned deliveries
+4. **Update Status** → Mark "Out for Delivery" → "Delivered"
+5. **Track Earnings** → View total deliveries & earnings
 
 ### Admin Functions
-1. **Access Admin Panel** at `/admin/`
-2. **Approve Restaurants**: Review and approve new listings
-3. **Manage Users**: View and moderate user accounts
-4. **Monitor Orders**: Track all platform orders
-5. **Review Donations**: Approve food donation listings
+
+1. **Admin Panel** → `/admin/`
+2. **Approve Restaurants** → Review new listings
+3. **Manage Users** → View profiles, moderate
+4. **Monitor Orders** → Track platform-wide orders
+5. **Review Donations** → Approve listings, verify proofs
+
+---
+
+## 🔌 API Integration
+
+### Geoapify API
+
+Used for location services throughout the platform:
+
+**Features:**
+- GPS geolocation
+- Address autocomplete
+- Reverse geocoding
+- Map display
+- Distance calculation
+
+**Implementation:**
+```javascript
+// static/js/geoapify.js
+class GeoapifyUtils {
+  async getCurrentLocation()      // Get user GPS
+  async reverseGeocode(lat, lon)  // Coords to address
+  initAutocomplete(input, onSelect)  // Address suggestions
+  calculateDistance(lat1, lon1, lat2, lon2)  // Distance calc
+}
+```
+
+**Usage:**
+- Cart page: Pick delivery address
+- Donations: Navigate to pickup
+- Restaurants: Location-based filtering
+
+### Stripe API
+
+Secure payment processing:
+
+**Features:**
+- Card payments
+- Payment intents
+- Webhook handling
+- Transaction tracking
+
+---
+
+## 🔐 Security Features
+
+- ✅ CSRF protection on all forms
+- ✅ Password hashing (Django's Argon2)
+- ✅ Session-based authentication
+- ✅ SQL injection prevention (Django ORM)
+- ✅ XSS protection (template escaping)
+- ✅ Secure file uploads with validation
+- ✅ Environment variables for sensitive data
+- ✅ Role-based access control
+- ✅ Input sanitization
+- ✅ HTTPS-ready (in production)
 
 ---
 
 ## 🧪 Testing
 
 ### Manual Testing
-- Login with test credentials for each user type
-- Test complete order flow (browse → add to cart → checkout)
-- Verify delivery agent workflow
-- Test restaurant owner CRUD operations
-- Check donation system functionality
 
-### Automated Tests
+**Test Accounts:**
+```
+Customer: username: customer_user, password: customer123
+Owner:    username: owner_user,    password: owner123
+Agent:    username: agent_user,    password: agent123
+```
+
+**Test Flows:**
+1. Customer order flow (browse → cart → checkout)
+2. Donation booking flow (list → book → navigate)
+3. Restaurant owner workflow (add restaurant → menu → orders)
+4. Delivery agent workflow (accept → deliver)
+
+### Run Automated Tests
 ```bash
 python manage.py test
 ```
@@ -416,63 +471,67 @@ python verify_auth.py
 
 ---
 
-## 🔐 Security Features
+## 📈 Future Enhancements
 
-- CSRF token protection on all forms
-- Password hashing with Django's built-in system
-- Session-based authentication
-- SQL injection protection via Django ORM
-- XSS prevention through template escaping
-- Secure file upload validation
-- Environment variable management for sensitive data
+- [ ] Real-time WebSocket order tracking
+- [ ] Mobile apps (iOS & Android)
+- [ ] AI-based food recommendations
+- [ ] Advanced analytics dashboard
+- [ ] Multi-language support
+- [ ] Push notifications
+- [ ] Loyalty rewards program
+- [ ] Review & rating system enhancements
+- [ ] Video reviews
+- [ ] Chatbot customer support
 
 ---
 
-## 📈 Future Enhancements
+## 🤝 Contributing
 
-- Real-time order tracking with maps integration
-- Mobile app (iOS & Android)
-- Advanced analytics dashboard for owners
-- AI-based food recommendations
-- Multi-language support
-- Push notifications
-- Loyalty rewards program
-- Review and rating system enhancements
-- Integration with multiple payment gateways
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ---
 
 ## 👥 Team & Contributors
 
-**Developed by**: Edunet Team-8
-
-**Project Lead**: [Your Name]
-
-**Team Members**: [Team Member Names]
+**Developed by**: Edunet Team-8  
+**GitHub**: [ANAND-JATOTHU](https://github.com/ANAND-JATOTHU)  
+**Year**: 2025
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
 ## 📞 Contact & Support
 
-For queries, suggestions, or support:
+- **GitHub**: https://github.com/ANAND-JATOTHU/Foodify
 - **Email**: support@foodify.com
-- **Website**: www.foodify.com
-- **GitHub**: [Your Repository URL]
+- **Issues**: Report bugs or request features via GitHub Issues
 
 ---
 
 ## 🎯 Conclusion
 
-Foodify is a complete, production-ready food delivery platform that demonstrates proficiency in full-stack web development, database design, payment integration, and modern UI/UX practices. The multi-role architecture makes it scalable and suitable for real-world deployment. The addition of the food donation feature showcases social responsibility and innovation beyond typical food delivery applications.
+Foodify is a **production-ready**, comprehensive food delivery platform that demonstrates:
+- ✅ Full-stack web development proficiency
+- ✅ Complex database design and ORM usage
+- ✅ Third-party API integrations (Stripe, Geoapify)
+- ✅ Modern UI/UX best practices
+- ✅ Social impact (food waste reduction)
+- ✅ Scalable architecture
 
-**Perfect for**: Academic projects, portfolio demonstration, startup MVP, or learning Django development.
+**Perfect for**: Portfolio projects, academic demonstrations, startup MVPs, learning Django development.
 
 ---
 
-**© 2025 Foodify | Designed with ❤️ for making food delivery seamless and intelligent**
+**© 2026 Foodify | Designed with ❤️ for seamless food delivery and waste reduction**
