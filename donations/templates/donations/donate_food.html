@@ -274,22 +274,17 @@
                     <div class="form-section">
                         <h3>📦 Quantity Details</h3>
                         
-                        <div class="form-group">
-                            <label>Quantity Description *</label>
-                            {{ form.quantity_description }}
-                            <small>e.g., "5 kg", "20 plates", "10 servings"</small>
-                        </div>
-                        
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Weight (kg)</label>
-                                {{ form.weight_kg }}
+                                <label>Quantity *</label>
+                                {{ form.original_quantity }}
+                                <small>Number of servings/plates/portions</small>
                             </div>
                             
                             <div class="form-group">
-                                <label>Serving Count</label>
-                                {{ form.serving_count }}
-                                <small>Number of people it can serve</small>
+                                <label>Unit *</label>
+                                {{ form.quantity_unit }}
+                                <small>e.g., plates, servings, kg</small>
                             </div>
                         </div>
                     </div>
@@ -300,7 +295,7 @@
                         
                         <div class="form-group">
                             <label>Address *</label>
-                            {{ form.address }}
+                            {{ form.location }}
                             <small>Click on the map to set exact location</small>
                         </div>
                         
@@ -309,8 +304,13 @@
                         
                         <div class="form-row">
                             <div class="form-group">
+                                <label>Contact Name *</label>
+                                {{ form.contact_name }}
+                            </div>
+                            
+                            <div class="form-group">
                                 <label>Phone Number *</label>
-                                {{ form.phone }}
+                                {{ form.contact_phone }}
                             </div>
                         </div>
                         
@@ -441,7 +441,7 @@ function reverseGeocode(lat, lng) {
         .then(data => {
             if (data.features && data.features.length > 0) {
                 const address = data.features[0].properties.formatted;
-                const addressField = document.getElementById('id_address');
+                const addressField = document.getElementById('id_location');
                 if (!addressField.value || confirm('Update address with clicked location?')) {
                     addressField.value = address;
                 }
@@ -451,7 +451,7 @@ function reverseGeocode(lat, lng) {
 }
 
 // Address search functionality
-const addressField = document.getElementById('id_address');
+const addressField = document.getElementById('id_location');
 let searchTimeout;
 
 addressField.addEventListener('input', function(e) {

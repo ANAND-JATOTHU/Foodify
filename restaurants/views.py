@@ -14,6 +14,7 @@ def restaurant_list(request):
     cuisine = request.GET.get('cuisine', '')
     veg_only = request.GET.get('veg', '')
     rating_filter = request.GET.get('rating', '')
+    calorie_range = request.GET.get('calorie_range', '')
     
     if search:
         restaurants = restaurants.filter(name__icontains=search) | restaurants.filter(cuisine__icontains=search)
@@ -23,6 +24,15 @@ def restaurant_list(request):
         restaurants = restaurants.filter(is_veg=True)
     if rating_filter:
         restaurants = restaurants.filter(rating__gte=float(rating_filter))
+    
+    # Filter by calorie range (filter restaurants with menu items in calorie range)
+    if calorie_range:
+        if calorie_range == 'low':
+            restaurants = restaurants.filter(menu_items__calories__lte=300, menu_items__calories__isnull=False).distinct()
+        elif calorie_range == 'medium':
+            restaurants = restaurants.filter(menu_items__calories__gt=300, menu_items__calories__lte=600).distinct()
+        elif calorie_range == 'high':
+            restaurants = restaurants.filter(menu_items__calories__gt=600).distinct()
     
     return render(request, 'restaurants/list.html', {'restaurants': restaurants})
 

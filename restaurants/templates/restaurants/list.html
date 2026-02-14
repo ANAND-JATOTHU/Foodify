@@ -361,6 +361,17 @@
                             <option value="15" {% if request.GET.distance == '15' %}selected{% endif %}>Within 15km</option>
                         </select>
                     </div>
+                    
+                    <!--Calorie Filter -->
+                    <div class="filter-group-pro">
+                        <label class="filter-label-pro">🔥 Calorie Range</label>
+                        <select name="calorie_range" class="filter-select-pro">
+                            <option value="">All Ranges</option>
+                            <option value="low" {% if request.GET.calorie_range == 'low' %}selected{% endif %}>Low (0-300 cal)</option>
+                            <option value="medium" {% if request.GET.calorie_range == 'medium' %}selected{% endif %}>Medium (301-600 cal)</option>
+                            <option value="high" {% if request.GET.calorie_range == 'high' %}selected{% endif %}>High (601+ cal)</option>
+                        </select>
+                    </div>
                 </div>
                 
                 <div class="filters-actions-pro">
