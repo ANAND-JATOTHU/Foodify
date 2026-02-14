@@ -120,6 +120,36 @@
     .add-to-cart-btn:hover {
         background: var(--primary-dark);
     }
+    .calorie-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+        color: white;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-top: 8px;
+    }
+    .filter-section {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        box-shadow: var(--shadow-sm);
+    }
+    .filter-controls {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    .filter-controls select {
+        padding: 10px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        background: white;
+    }
 </style>
 
 <div class="restaurant-header">
@@ -162,6 +192,36 @@
         <p style="color: var(--text-muted); margin-bottom: 30px;">{{ restaurant.description }}</p>
     {% endif %}
     
+    <!-- Filter and Sort Section -->
+    <div class="filter-section">
+        <form method="get" action="" style="margin: 0;">
+            <div class="filter-controls">
+                <div>
+                    <label style="font-weight: 600; margin-right: 8px;">🔥 Calorie Range:</label>
+                    <select name="calorie_range" onchange="this.form.submit()">
+                        <option value="">All Ranges</option>
+                        <option value="low" {% if request.GET.calorie_range == 'low' %}selected{% endif %}>Low (0-300 cal)</option>
+                        <option value="medium" {% if request.GET.calorie_range == 'medium' %}selected{% endif %}>Medium (301-600 cal)</option>
+                        <option value="high" {% if request.GET.calorie_range == 'high' %}selected{% endif %}>High (601+ cal)</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-weight: 600; margin-right: 8px;">📊 Sort By:</label>
+                    <select name="sort_by" onchange="this.form.submit()">
+                        <option value="">Default</option>
+                        <option value="calories_low" {% if request.GET.sort_by == 'calories_low' %}selected{% endif %}>Calories (Low to High)</option>
+                        <option value="calories_high" {% if request.GET.sort_by == 'calories_high' %}selected{% endif %}>Calories (High to Low)</option>
+                        <option value="price_low" {% if request.GET.sort_by == 'price_low' %}selected{% endif %}>Price (Low to High)</option>
+                        <option value="price_high" {% if request.GET.sort_by == 'price_high' %}selected{% endif %}>Price (High to Low)</option>
+                    </select>
+                </div>
+                {% if request.GET.calorie_range or request.GET.sort_by %}
+                <a href="{% url 'restaurants:restaurant_detail' restaurant.id %}" style="color: var(--primary); text-decoration: none; font-weight: 600;">Clear Filters</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    
     {% if menu_items %}
         <div class="menu-grid">
             {% for item in menu_items %}
@@ -187,6 +247,12 @@
                     
                     {% if item.description %}
                         <p style="color: var(--text-muted); font-size: 0.9rem; margin: 10px 0;">{{ item.description }}</p>
+                    {% endif %}
+                    
+                    {% if item.calories %}
+                    <div class="calorie-badge">
+                        🔥 {{ item.calories }} cal
+                    </div>
                     {% endif %}
                     
                     {% if user.is_authenticated %}

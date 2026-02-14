@@ -83,6 +83,11 @@
                     <h3>{{ item.name }}</h3>
                     <div class="price">₹{{ item.price }}</div>
                     <p style="font-size: 0.9rem; color: var(--text-muted);">{{ item.description|truncatewords:15 }}</p>
+                    {% if item.calories %}
+                    <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); color: white; padding: 4px 10px; border-radius: 15px; font-size: 0.85rem; font-weight: 600; display: inline-block; margin-top: 8px;">
+                        🔥 {{ item.calories }} cal
+                    </div>
+                    {% endif %}
                     <div style="margin-top: 10px;">
                         {% if item.is_veg %}<span style="background: green; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem;">VEG</span>{% endif %}
                         {% if not item.is_available %}<span style="background: #ef4444; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; margin-left: 5px;">UNAVAILABLE</span>{% endif %}

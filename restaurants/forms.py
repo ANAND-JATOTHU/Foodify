@@ -23,13 +23,15 @@ class MenuItemForm(forms.ModelForm):
     """Form for restaurant owners to add/edit menu items"""
     class Meta:
         model = MenuItem
-        fields = ['name', 'price', 'description', 'image', 'is_veg', 'is_available']
+        fields = ['name', 'price', 'description', 'image', 'calories', 'is_veg', 'is_available']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'calories': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'e.g., 350'}),
         }
         labels = {
+            'calories': 'Calories (per serving)',
             'is_veg': 'Vegetarian Item',
             'is_available': 'Currently Available',
         }

@@ -39,6 +39,7 @@ class MenuItem(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2)
     description = models.TextField()
     image = models.ImageField(upload_to='menu_items/', blank=True, null=True)
+    calories = models.PositiveIntegerField(blank=True, null=True, help_text='Calories per serving')
     is_available = models.BooleanField(default=True)
     is_veg = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

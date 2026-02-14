@@ -129,6 +129,27 @@ def restaurant_detail(request, restaurant_id):
     restaurant = get_object_or_404(Restaurant, id=restaurant_id, is_approved=True)
     menu_items = restaurant.menu_items.filter(is_available=True)
     
+    # Calorie filtering
+    calorie_range = request.GET.get('calorie_range', '')
+    if calorie_range:
+        if calorie_range == 'low':
+            menu_items = menu_items.filter(calories__lte=300, calories__isnull=False)
+        elif calorie_range == 'medium':
+            menu_items = menu_items.filter(calories__gt=300, calories__lte=600)
+        elif calorie_range == 'high':
+            menu_items = menu_items.filter(calories__gt=600)
+    
+    # Sorting
+    sort_by = request.GET.get('sort_by', '')
+    if sort_by == 'calories_low':
+        menu_items = menu_items.order_by('calories')
+    elif sort_by == 'calories_high':
+        menu_items = menu_items.order_by('-calories')
+    elif sort_by == 'price_low':
+        menu_items = menu_items.order_by('price')
+    elif sort_by == 'price_high':
+        menu_items = menu_items.order_by('-price')
+    
     # Group menu items by category if needed (for now showing all)
     context = {
         'restaurant': restaurant,
