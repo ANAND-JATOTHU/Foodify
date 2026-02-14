@@ -1,0 +1,289 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Book {{ donation.food_name }} - Foodify{% endblock %}
+
+{% block content %}
+<!-- Load Geoapify JS -->
+<script src="{% static 'js/geoapify.js' %}"></script>
+
+<style>
+    .booking-page {
+        max-width: 900px;
+        margin: 100px auto 60px;
+        padding: 0 20px;
+    }
+    
+    .booking-card {
+        background: white;
+        border-radius: 15px;
+        padding: 35px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    
+    .booking-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .booking-header h1 {
+        font-size: 2rem;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    
+    .donation-summary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 25px;
+        border-radius: 12px;
+        color: white;
+        margin-bottom: 30px;
+    }
+    
+    .donation-summary h2 {
+        margin-bottom: 15px;
+    }
+    
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 1.05rem;
+    }
+    
+    .form-section {
+        margin-bottom: 25px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #333;
+    }
+    
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+    
+    .form-group input:focus,
+    .form-group textarea:focus {
+        border-color: #667eea;
+        outline: none;
+    }
+    
+    .quantity-selector {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+    }
+    
+    .quantity-btn {
+        width: 40px;
+        height: 40px;
+        border: none;
+        background: #667eea;
+        color: white;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .quantity-btn:hover {
+        background: #5568d3;
+        transform: scale(1.1);
+    }
+    
+    .quantity-display {
+        font-size: 1.5rem;
+        font-weight: 700;
+        min-width: 60px;
+        text-align: center;
+        color: #667eea;
+    }
+    
+    .quantity-label {
+        flex: 1;
+        font-weight: 600;
+        color: #666;
+    }
+    
+    .submit-section {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+    
+    .btn-submit {
+        flex: 1;
+        padding: 15px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-cancel {
+        padding: 15px 30px;
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+    
+    .btn-cancel:hover {
+        background: #f5f5f5;
+    }
+    
+    .help-text {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 5px;
+    }
+</style>
+
+<div class="booking-page">
+    <div class="booking-card">
+        <div class="booking-header">
+            <h1>📦 Book Food Donation</h1>
+            <p style="color: #666;">Fill in the details below to book this donation</p>
+        </div>
+        
+        <div class="donation-summary">
+            <h2>{{ donation.food_name }}</h2>
+            <div class="summary-row">
+                <span>📊 Available:</span>
+                <strong>{{ donation.available_quantity }} {{ donation.quantity_unit }}</strong>
+            </div>
+            <div class="summary-row">
+                <span>⏱️ Expires in:</span>
+                <strong>{{ donation.hours_until_expiry|floatformat:1 }} hours</strong>
+            </div>
+            <div class="summary-row">
+                <span>📍 Location:</span>
+                <strong>{{ donation.location|truncatewords:10 }}</strong>
+            </div>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-section">
+                <h3 style="margin-bottom: 20px;">Booking Details</h3>
+                
+                <div class="form-group">
+                    <label>Select Quantity *</label>
+                    <div class="quantity-selector">
+                        <button type="button" class="quantity-btn" onclick="decrementQuantity()">-</button>
+                        <div class="quantity-display" id="quantity-display">1</div>
+                        <button type="button" class="quantity-btn" onclick="incrementQuantity()">+</button>
+                        <span class="quantity-label">{{ donation.quantity_unit }}</span>
+                    </div>
+                    <input type="hidden" name="quantity_booked" id="quantity_booked" value="1" required>
+                    <p class="help-text">Maximum: {{ donation.available_quantity }} {{ donation.quantity_unit }}</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.booker_name.id_for_label }}">Your Name *</label>
+                    {{ form.booker_name }}
+                    {% if form.booker_name.errors %}
+                        <p class="help-text" style="color: #ff4444;">{{ form.booker_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.booker_phone.id_for_label }}">Your Phone Number *</label>
+                    {{ form.booker_phone }}
+                    <p class="help-text">The donor will contact you on this number</p>
+                    {% if form.booker_phone.errors %}
+                        <p class="help-text" style="color: #ff4444;">{{ form.booker_phone.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.booker_email.id_for_label }}">Your Email (Optional)</label>
+                    {{ form.booker_email }}
+                    {% if form.booker_email.errors %}
+                        <p class="help-text" style="color: #ff4444;">{{ form.booker_email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.preferred_collection_time.id_for_label }}">Preferred Collection Time (Optional)</label>
+                    {{ form.preferred_collection_time }}
+                    {% if form.preferred_collection_time.errors %}
+                        <p class="help-text" style="color: #ff4444;">{{ form.preferred_collection_time.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.notes.id_for_label }}">Additional Notes (Optional)</label>
+                    {{ form.notes }}
+                    <p class="help-text">Any special requests or information</p>
+                    {% if form.notes.errors %}
+                        <p class="help-text" style="color: #ff4444;">{{ form.notes.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="submit-section">
+                <a href="{% url 'donations:donation_detail' donation.id %}" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-submit">✅ Confirm Booking</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const maxQuantity = {{ donation.available_quantity }};
+    let currentQuantity = 1;
+    
+    function updateQuantityDisplay() {
+        document.getElementById('quantity-display').textContent = currentQuantity;
+        document.getElementById('quantity_booked').value = currentQuantity;
+    }
+    
+    function incrementQuantity() {
+        if (currentQuantity < maxQuantity) {
+            currentQuantity++;
+            updateQuantityDisplay();
+        }
+    }
+    
+    function decrementQuantity() {
+        if (currentQuantity > 1) {
+            currentQuantity--;
+            updateQuantityDisplay();
+        }
+    }
+</script>
+
+{% endblock %}

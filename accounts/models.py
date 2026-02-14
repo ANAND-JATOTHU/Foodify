@@ -66,15 +66,17 @@ class DeliveryAgent(models.Model):
     
     @property
     def total_deliveries(self):
-        """Count of delivered orders"""
-        return self.user.assigned_orders.filter(status='delivered').count()
+        """Total number of deliveries completed"""
+        from orders.models import Order
+        return Order.objects.filter(delivery_agent=self.user, status='delivered').count()
     
     @property
     def total_earnings(self):
-        """Total earnings from delivered orders"""
+        """Total earnings from deliveries"""
+        from orders.models import Order
         from decimal import Decimal
-        delivered_orders = self.user.assigned_orders.filter(status='delivered')
-        return sum(order.delivery_fee for order in delivered_orders) or Decimal('0.00')
+        delivered_orders = Order.objects.filter(delivery_agent=self.user, status='delivered')
+        return sum(order.delivery_fee for order in delivered_orders) if delivered_orders.exists() else Decimal('0.00')
     
     class Meta:
         verbose_name = 'Delivery Agent'
