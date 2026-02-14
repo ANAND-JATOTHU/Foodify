@@ -38,18 +38,33 @@
         <a href="{% url 'index' %}" class="logo" style="text-decoration:none;">🍴 Foodify</a>
         <ul class="nav-links">
             <li><a href="{% url 'index' %}">Home</a></li>
-            <li><a href="{% url 'restaurants:list' %}">Restaurants</a></li>
-            <li><a href="{% url 'donations:donation_list' %}">Donations</a></li>
+            
             {% if user.is_authenticated %}
-                {% if user.profile.is_customer %}
-                    <li><a href="{% url 'orders:view_cart' %}">My Order</a></li>
-                {% elif user.profile.is_restaurant_owner %}
+                {% if user.profile.is_restaurant_owner %}
+                    <!-- Restaurant Owner Navigation -->
+                    <li><a href="{% url 'restaurants:owner_dashboard' %}">My Restaurants</a></li>
                     <li><a href="{% url 'orders:owner_orders' %}">Orders</a></li>
+                    <li><a href="{% url 'donations:donation_list' %}">Donations</a></li>
+                    <li><a href="{% url 'contact' %}">Contact</a></li>
+                {% elif user.profile.is_customer %}
+                    <!-- Customer Navigation -->
+                    <li><a href="{% url 'restaurants:list' %}">Restaurants</a></li>
+                    <li><a href="{% url 'donations:donation_list' %}">Donations</a></li>
+                    <li><a href="{% url 'orders:view_cart' %}">My Order</a></li>
+                    <li><a href="{% url 'contact' %}">Contact</a></li>
                 {% elif user.profile.is_delivery_agent %}
+                    <!-- Delivery Agent Navigation -->
+                    <li><a href="{% url 'restaurants:list' %}">Restaurants</a></li>
+                    <li><a href="{% url 'donations:donation_list' %}">Donations</a></li>
                     <li><a href="{% url 'delivery:dashboard' %}">My Deliveries</a></li>
+                    <li><a href="{% url 'contact' %}">Contact</a></li>
                 {% endif %}
+            {% else %}
+                <!-- Guest Navigation -->
+                <li><a href="{% url 'restaurants:list' %}">Restaurants</a></li>
+                <li><a href="{% url 'donations:donation_list' %}">Donations</a></li>
+                <li><a href="{% url 'contact' %}">Contact</a></li>
             {% endif %}
-            <li><a href="{% url 'contact' %}">Contact</a></li>
         </ul>
         <div class="nav-right">
             {% if user.is_authenticated %}
@@ -64,11 +79,6 @@
                     </a>
                 {% endif %}
                 <span style="color: white; margin-right: 15px;">Hi, {{ user.username }}!</span>
-                {% if user.profile.is_restaurant_owner %}
-                    <a href="{% url 'restaurants:owner_dashboard' %}" class="nav-btn-text">My Restaurants</a>
-                {% elif user.profile.is_delivery_agent %}
-                    <a href="{% url 'delivery:dashboard' %}" class="nav-btn-text">Dashboard</a>
-                {% endif %}
                 <a href="{% url 'accounts:logout' %}" class="nav-btn-text">Logout</a>
             {% else %}
                 <a href="{% url 'accounts:login' %}" class="nav-btn-primary">Login / Sign Up</a>

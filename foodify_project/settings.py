@@ -172,4 +172,18 @@ PAYMENT_VARIANTS = {
 
 # Geoapify Configuration
 # Get your API key from:  https://www.geoapify.com/
-GEOAPIFY_API_KEY = os.environ.get('GEOAPIFY_API_KEY', '')
+GEOAPIFY_API_KEY = os.getenv('GEOAPIFY_API_KEY', '')
+
+# Email Configuration
+# For development, we'll use console backend (prints emails to console)
+# For production with Gmail, uncomment the Gmail SMTP settings below
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Gmail SMTP Configuration (uncomment for production)
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'anandhyd2006@gmail.com'
+# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')  # Add to .env file
+DEFAULT_FROM_EMAIL = 'anandhyd2006@gmail.com'
